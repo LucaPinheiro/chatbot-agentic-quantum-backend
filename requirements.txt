@@ -1,10 +1,32 @@
-fastapi==0.109.2
-uvicorn==0.27.1
-sqlalchemy==2.0.27
-psycopg2-binary==2.9.9
-redis==5.0.1
-pydantic==2.6.1
-pydantic-settings==2.1.0
-python-dotenv==1.0.1
-alembic==1.13.1
-asyncpg==0.29.0
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+redis
+pydantic
+pydantic-settings
+python-dotenv
+asyncpg
+
+# Testes
+pytest
+pytest-asyncio
+pytest-cov
+pytest-mock
+
+# Langchain
+langchain
+langchain-openai
+langchain-community
+langchain-core
+
+# OpenAI
+openai
+
+# aws
+boto3
+
+# AI
+pydantic-ai
+
+
