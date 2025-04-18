@@ -1,27 +1,37 @@
-# env.py
+# env.py  (na raiz)
+
 import os
+from pathlib import Path
+from types import SimpleNamespace
+
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env, se existir na raiz do projeto
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
-# Exemplo de uso: acesso às variáveis
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
+settings = SimpleNamespace(
+    # --- API ---
+    API_V1_STR="/api",
+    PROJECT_NAME=os.getenv("PROJECT_NAME", "Quantum Tutor Chatbot"),
+    DESCRIPTION=os.getenv(
+        "DESCRIPTION",
+        "Chatbot tutor de computação quântica com RAG e multi‑agentes",
+    ),
+    VERSION=os.getenv("VERSION", "0.1.0"),
 
-REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PORT = os.getenv('REDIS_PORT')
+    # --- Flags ---
+    DEBUG=os.getenv("DEBUG", "true").lower() == "true",
 
-if __name__ == "__main__":
-    # Apenas para testar se as variáveis estão sendo carregadas corretamente
-    print("Configuração do PostgreSQL:")
-    print(f"Host: {POSTGRES_HOST}")
-    print(f"Port: {POSTGRES_PORT}")
-    print(f"User: {POSTGRES_USER}")
-    print(f"DB: {POSTGRES_DB}")
-    print("\nConfiguração do Redis:")
-    print(f"Host: {REDIS_HOST}")
-    print(f"Port: {REDIS_PORT}")
+    # --- CORS (lista separada por vírgula) ---
+    BACKEND_CORS_ORIGINS=[
+        o.strip() for o in os.getenv("BACKEND_CORS_ORIGINS", "*").split(",")
+    ],
+
+    # --- Bancos / filas (use se precisar) ---
+    POSTGRES_HOST=os.getenv("POSTGRES_HOST"),
+    POSTGRES_PORT=int(os.getenv("POSTGRES_PORT", 5432)),
+    POSTGRES_USER=os.getenv("POSTGRES_USER"),
+    POSTGRES_PASSWORD=os.getenv("POSTGRES_PASSWORD"),
+    POSTGRES_DB=os.getenv("POSTGRES_DB"),
+    REDIS_HOST=os.getenv("REDIS_HOST"),
+    REDIS_PORT=int(os.getenv("REDIS_PORT", 6379)),
+)
