@@ -1,48 +1,50 @@
 # src/app/main.py
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes import routers
 import uvicorn
 
-from src.env import settings
-from src.api.router import api_router
+from app.core.settings import load_settings
 
+# Carrega configurações
+settings = load_settings()
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title=settings.PROJECT_NAME,
-        description=settings.DESCRIPTION,
-        version=settings.VERSION,
+        title=settings.project_name,
+        description=settings.description,
+        version=settings.version,
         docs_url="/docs",
         redoc_url="/redoc",
-        openapi_url=f"{settings.API_V1_STR}/openapi.json",
+        openapi_url=f"{settings.api_v1_str}/openapi.json",
     )
 
-    if settings.BACKEND_CORS_ORIGINS:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=settings.BACKEND_CORS_ORIGINS,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+    if settings.debug:
+        print("CORS habilitado para desenvolvimento.")
+        print(f"Servidor rodando em http://0.0.0.0:8000 🚀 {settings.app_env.value}")
+        
 
-    app.include_router(api_router, prefix=settings.API_V1_STR)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"], 
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.include_router(routers, prefix=settings.api_v1_str)
     return app
-
 
 app = create_app()
 
-
 if __name__ == "__main__":
-    print(f"Servidor rodando em http://0.0.0.0:8000")
-    
+
+
     uvicorn.run(
         "src.app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=settings.DEBUG,
-        log_level="debug" if settings.DEBUG else "info",
+        reload=settings.debug,
+        log_level="debug" if settings.debug else "info",
     )
-    
-    
-    
