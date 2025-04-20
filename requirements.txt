@@ -28,5 +28,6 @@ boto3
 
 # AI
 pydantic-ai
+pydantic[email]
 
 
