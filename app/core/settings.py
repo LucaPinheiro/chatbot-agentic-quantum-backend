@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     api_v1_str: str = "/api/v1"
 
     # ─────────────── Runtime ───────────────
-    app_env: StageEnum = StageEnum.dev
+    app_env: StageEnum = StageEnum.local
     debug: bool = False
     log_level: str = "INFO"
 
