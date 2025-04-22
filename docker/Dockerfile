@@ -13,8 +13,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt requirements-dev.txt ./
 
 # Instala dependências do projeto
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r requirements-dev.txt
+RUN pip install --no-cache-dir --default-timeout=100 --retries=10 \
+    -i https://pypi.org/simple \
+    -r requirements.txt
+
+RUN pip install --no-cache-dir --default-timeout=100 --retries=10 \
+    -i https://pypi.org/simple \
+    -r requirements-dev.txt
+
 
 # Em produção, descomente para copiar o código:
 # COPY . .
