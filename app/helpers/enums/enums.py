@@ -1,4 +1,5 @@
 from enum import Enum
+from enum import IntEnum
 
 
 class UserTypeEnum(Enum):
@@ -16,3 +17,10 @@ class UserStatusEnum(Enum):
 class AccessClassEnum(Enum):
     ACCEPTED = 1
     DENIED = 2
+    
+    
+class PermissionLevelEnum(IntEnum):
+    USER = 1 # aluno
+    MODERATOR = 2 # professor
+    ADMIN = 3 # admin
+
