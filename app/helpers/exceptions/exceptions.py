@@ -50,3 +50,20 @@ class DatabaseException(MainException):
 
     def __init__(self, message):
         super().__init__(f"An error occurred in the database: {message}")
+        
+class UnauthorizedException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+
+class UnprocessableEntityException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+
+class ForbiddenException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
