@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     # ─────────────── CORS / Segurança ───────────────
     backend_cors_origins: str = ""
+    jwt_secret: str = "JWT_SECRET"  
     secret_key: str = "SECRET_KEY"
     access_token_expire_minutes: int = 30
 
@@ -79,7 +80,7 @@ class Settings(BaseSettings):
             f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}{suffix}"
         )
-
+        
     @property
     def redis_url(self) -> str:
         suffix = SUFFIXES[self.app_env]
