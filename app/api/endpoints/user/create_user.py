@@ -1,15 +1,18 @@
+import datetime
 import uuid
 
 from fastapi import APIRouter
+from app.core.permissions import RequirePermission
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
+from app.helpers.enums.enums import PermissionLevelEnum
 from app.helpers.utils.encrypt import Encrypt
 from app.infra.repository import Repository
 from app.schemas.create_user import CreateUserRequest, CreateUserResponse
 
 router = APIRouter()
 
-class CreateUserUseCase:
+class UseCase:
     repository: Repository
     user_repo: IUserRepository
     
@@ -26,6 +29,8 @@ class CreateUserUseCase:
             name=schema.name,
             email=schema.email,
             password=hashed_pw,
+            created_at=datetime.datetime.now(),
+            permission=schema.permission
         )
 
         user_created = self.user_repo.create_user(user)
@@ -37,8 +42,8 @@ class CreateUserUseCase:
         )
 
 
-class CreateUserController:
-    def __init__(self, use_case: CreateUserUseCase):
+class Controller:
+    def __init__(self, use_case: UseCase):
         self.use_case = use_case
 
     def handle(self, request: CreateUserRequest) -> CreateUserResponse:
@@ -46,7 +51,10 @@ class CreateUserController:
 
 
 @router.post("/users", response_model=CreateUserResponse, status_code=201)
-def create_user(request: CreateUserRequest):
-    controller = CreateUserController(CreateUserUseCase())
+def create_user(
+    request: CreateUserRequest,
+    user: User = RequirePermission(PermissionLevelEnum.ADMIN) 
+):
+    controller = Controller(UseCase())
     return controller.handle(request)
 
