@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-
+from datetime import datetime
 from app.core.settings import load_settings
 from app.models.models import Base, User  # ← Modelo ORM
 from app.helpers.utils.encrypt import Encrypt  # ← Para hashear a senha
@@ -29,6 +29,7 @@ def create_db_tables():
                     name="Admin Teste",
                     email="admin@example.com",
                     password=Encrypt.hash_password("admin123"),  
+                    created_at=datetime.now(),
                     permission=3
                 )
                 session.add(admin)
