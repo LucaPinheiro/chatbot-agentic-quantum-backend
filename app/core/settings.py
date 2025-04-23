@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     api_v1_str: str = "/api/v1"
 
     # ─────────────── Runtime ───────────────
-    app_env: StageEnum = StageEnum.local
+    stage: StageEnum = StageEnum.local
     debug: bool = False
     log_level: str = "INFO"
 
@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     # ─────────────── Computed Properties ───────────────
     @property
     def postgres_url(self) -> str:
-        suffix = SUFFIXES[self.app_env]
+        suffix = SUFFIXES[self.stage]
         if self.postgres_url_prefix:
             return self.postgres_url_prefix + suffix
         return (
@@ -83,14 +83,14 @@ class Settings(BaseSettings):
         
     @property
     def redis_url(self) -> str:
-        suffix = SUFFIXES[self.app_env]
+        suffix = SUFFIXES[self.stage]
         if self.redis_url_prefix:
             return self.redis_url_prefix + suffix
         return f"redis://{self.redis_host}:{self.redis_port}/0"
 
     @property
     def s3_bucket(self) -> str:
-        return self.s3_bucket_prefix + SUFFIXES[self.app_env]
+        return self.s3_bucket_prefix + SUFFIXES[self.stage]
 
     # ─────────────── Configuração do Pydantic ───────────────
     model_config = SettingsConfigDict(

@@ -25,7 +25,7 @@ def create_db_tables():
             admin_exists = session.query(User).filter_by(email="admin@example.com").first()
             if not admin_exists:
                 admin = User(
-                    id="admin-id-001",
+                    user_id="admin-id-001",
                     name="Admin Teste",
                     email="admin@example.com",
                     password=Encrypt.hash_password("admin123"),  

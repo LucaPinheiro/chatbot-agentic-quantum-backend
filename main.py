@@ -22,7 +22,7 @@ def create_app() -> FastAPI:
 
     if settings.debug:
         print("CORS habilitado para desenvolvimento.")
-        print(f"Servidor rodando em http://0.0.0.0:8000 🚀 {settings.app_env.value}")
+        print(f"Servidor rodando em http://0.0.0.0:8000 🚀 {settings.stage.value}")
         
 
     app.add_middleware(

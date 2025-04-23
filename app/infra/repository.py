@@ -21,7 +21,7 @@ class Repository:
     def __init__(self, user_repo: bool = False, file_repo: bool = False):
         self.session = None
 
-        if settings.app_env == StageEnum.test:
+        if settings.stage == StageEnum.test:
             self._initialize_mock_repositories(user_repo)
         else:
             self._initialize_real_repositories(user_repo, file_repo)
@@ -66,7 +66,7 @@ class Repository:
 
 if __name__ == "__main__":
     import os
-    print(f"STAGE: {os.getenv('APP_ENV')}")
+    print(f"STAGE: {os.getenv('stage')}")
     print(f"POSTGRES_URL: {settings.postgres_url}")
     print(f"SECRET_KEY: {settings.secret_key}")
 

@@ -7,7 +7,7 @@ from app.models.models import User as UserModel
 
 
 class User(BaseModel):
-    id: str
+    user_id: str
     name: str
     email: str
     password: str
@@ -16,7 +16,7 @@ class User(BaseModel):
     @classmethod
     def from_orm(cls, user: Type[UserModel]) -> Self:
         return cls(
-            id=user.id,
+            user_id=user.user_id,
             name=user.name,
             email=user.email,
             password=user.password,
@@ -26,7 +26,7 @@ class User(BaseModel):
         
     def to_orm(self) -> UserModel:
         return UserModel(
-            id=self.id,
+            user_id=self.user_id,
             name=self.name,
             email=self.email,
             password=self.password,
@@ -39,7 +39,7 @@ class User(BaseModel):
             exclude = []
             
             user = {
-                "id": self.id,
+                "user_id": self.user_id,
                 "name": self.name,
                 "email": self.email,
                 "password": self.password,

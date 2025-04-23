@@ -150,7 +150,7 @@ class SQSResources:
 
     def send_message(self, sqs_message: SQSMessage) -> bool:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return True
             response = self.sqs.send_message(
                 QueueUrl=settings.sqs_queue_url,
@@ -166,11 +166,11 @@ class SQSResources:
 
 class RekognitionResources:
     def __init__(self, region_name: str = settings.aws_region):
-        if settings.app_env != StageEnum.test:
+        if settings.stage != StageEnum.test:
             self.rekognition = boto3.client("rekognition", region_name=region_name)
 
     def search_face(self, source_image: str) -> Dict[str, Union[bool, str]]:
-        if settings.app_env == StageEnum.test:
+        if settings.stage == StageEnum.test:
             return {"match": True}
         try:
             image = base64.b64decode(source_image)
@@ -190,7 +190,7 @@ class RekognitionResources:
 
     def index_faces(self, image: bytes, citizen_id: str) -> Optional[str]:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return "test"
             response = self.rekognition.index_faces(
                 CollectionId=settings.rekognition_collection_id,
@@ -205,7 +205,7 @@ class RekognitionResources:
 
     def delete_faces(self, face_ids: list) -> bool:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return True
             response = self.rekognition.delete_faces(
                 CollectionId=settings.rekognition_collection_id,
@@ -223,7 +223,7 @@ class S3Resources:
 
     def get_object_link(self, key: str) -> str:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return "test"
             url = self.s3.generate_presigned_url(
                 ClientMethod="get_object",
@@ -240,7 +240,7 @@ class S3Resources:
 
     def get_object(self, key: str) -> dict:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return {"Body": b"test"}
             response = self.s3.get_object(
                 Bucket=settings.aws_s3_bucket,
@@ -253,7 +253,7 @@ class S3Resources:
 
     def put_object(self, key: str, body: bytes) -> bool:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return True
             response = self.s3.put_object(
                 Bucket=settings.aws_s3_bucket,
@@ -267,7 +267,7 @@ class S3Resources:
 
     def list_objects(self) -> list:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return []
             response = self.s3.list_objects_v2(Bucket=settings.aws_s3_bucket)
             return response.get("Contents", [])
@@ -277,7 +277,7 @@ class S3Resources:
 
     def list_objects_by_prefix(self, prefix: str) -> list:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return []
             response = self.s3.list_objects_v2(
                 Bucket=settings.aws_s3_bucket,
@@ -290,7 +290,7 @@ class S3Resources:
 
     def delete_object(self, key: str) -> bool:
         try:
-            if settings.app_env == StageEnum.test:
+            if settings.stage == StageEnum.test:
                 return True
             response = self.s3.delete_object(
                 Bucket=settings.aws_s3_bucket,
