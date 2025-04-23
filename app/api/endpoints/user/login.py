@@ -18,7 +18,7 @@ class LoginUseCase:
         if not user or not Encrypt.verify_password(password, user.password):
             raise UnauthorizedException("Usuário ou senha inválidos")
 
-        token = JWToken.encode(user_id=user.id, permission=user.permission)
+        token = JWToken.encode(user_id=user.user_id, permission=user.permission)
         return LoginResponse(token=token)
 
 class LoginController:
