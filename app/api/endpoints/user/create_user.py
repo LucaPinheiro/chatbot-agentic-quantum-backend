@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.core.permissions import RequirePermission
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
@@ -9,6 +9,7 @@ from app.helpers.enums.enums import PermissionLevelEnum
 from app.helpers.utils.encrypt import Encrypt
 from app.infra.repository import Repository
 from app.schemas.create_user import CreateUserRequest, CreateUserResponse
+from app.helpers.exceptions.exceptions import DatabaseException, UnauthorizedException, DuplicatedException
 
 router = APIRouter()
 
@@ -21,6 +22,11 @@ class UseCase:
         self.user_repo = self.repository.user_repo
 
     def execute(self, schema: CreateUserRequest) -> CreateUserResponse:
+        
+        verify_user_exists = self.user_repo.get_user_by_email(schema.email)
+        if verify_user_exists:
+            raise DuplicatedException("Usuário já existe")
+        
         new_id = uuid.uuid4().hex
         hashed_pw = Encrypt.hash_password(schema.password)
 
@@ -47,7 +53,16 @@ class Controller:
         self.use_case = use_case
 
     def handle(self, request: CreateUserRequest) -> CreateUserResponse:
-        return self.use_case.execute(request)
+        try:
+            return self.use_case.execute(request)
+        except DatabaseException as e:
+            raise HTTPException(status_code=500, detail=f"Erro de banco de dados: {str(e)}")
+        except UnauthorizedException as e:
+            raise HTTPException(status_code=401, detail=str(e))
+        except DuplicatedException as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro inesperado: {str(e)}")
 
 
 @router.post("/users", response_model=CreateUserResponse, status_code=201)
@@ -55,6 +70,10 @@ def create_user(
     request: CreateUserRequest,
     user: User = RequirePermission(PermissionLevelEnum.ADMIN) 
 ):
-    controller = Controller(UseCase())
-    return controller.handle(request)
-
+    try:
+        controller = Controller(UseCase())
+        return controller.handle(request)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro na rota de criação de usuário: {str(e)}")
