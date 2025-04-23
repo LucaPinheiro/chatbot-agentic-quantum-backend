@@ -1,15 +1,11 @@
-# Makefile para o projeto Quantum Chatbot
-
 PROJECT_NAME=chatbot-agentic-quantum-backend
 APP_CONTAINER_NAME=docker-app-1
+STAGE ?=local
 
 ## ────────────────────────────── Docker ────────────────────────────── ##
 
-up-dev:
-	docker compose -f docker/docker-compose.dev.yml -f docker-compose.yml up --build -d
-
 up:
-	docker compose -f docker-compose.yml up -d
+	docker compose -f docker/docker-compose.dev.yml -f docker-compose.yml up --build -d
 
 down:
 	docker compose -f docker/docker-compose.dev.yml -f docker-compose.yml down
@@ -21,7 +17,7 @@ ps:
 	docker compose ps
 
 restart:
-	make down && make up-dev
+	make down && make up
 
 status:
 	@echo "\n📦 Containers:" && docker ps --format "table {{.Names}}	{{.Status}}	{{.Ports}}" \
@@ -30,7 +26,8 @@ status:
 ## ────────────────────────────── Banco ─────────────────────────────── ##
 
 init-db:
-	docker exec -e PYTHONPATH=/app -it $(APP_CONTAINER_NAME) python -m app.helpers.functions.create_tables
+	docker exec -e STAGE=$(STAGE) -e PYTHONPATH=/app -it $(APP_CONTAINER_NAME) \
+		python -m app.helpers.functions.create_tables
 
 reset-db:
 	docker rm -f $(PROJECT_NAME)-postgres-1 || true \
