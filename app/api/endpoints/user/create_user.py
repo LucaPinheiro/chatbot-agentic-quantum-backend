@@ -25,7 +25,7 @@ class UseCase:
         hashed_pw = Encrypt.hash_password(schema.password)
 
         user = User(
-            id=new_id,
+            user_id=new_id,
             name=schema.name,
             email=schema.email,
             password=hashed_pw,
@@ -36,7 +36,7 @@ class UseCase:
         user_created = self.user_repo.create_user(user)
 
         return CreateUserResponse(
-            id=user_created.id,
+            user_id=user_created.user_id,
             name=user_created.name,
             email=user_created.email,
         )
