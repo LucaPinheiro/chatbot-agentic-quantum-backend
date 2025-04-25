@@ -8,26 +8,29 @@ from app.schemas.login import LoginRequest, LoginResponse
 router = APIRouter()
 
 
-class LoginUseCase:
+class UseCase:
     def __init__(self):
         self.repository = Repository(user_repo=True)
         self.user_repo = self.repository.user_repo
 
-    def execute(self, email: str, password: str) -> LoginResponse:
-        user = self.user_repo.get_user_by_email(email)
+    def execute(self, schema: LoginRequest) -> LoginResponse:
+        user = self.user_repo.get_user_by_email(schema.email)
         if not user:
             raise UnauthorizedException("Usuário não encontrado")
-
+        
+        if not Encrypt.verify_password(schema.password, user.password):
+            raise UnauthorizedException("Senha inválida")
+        
         token = JWToken.encode(user_id=user.user_id, permission=user.permission)
         return LoginResponse(token=token)
 
 class LoginController:
-    def __init__(self, use_case: LoginUseCase):
+    def __init__(self, use_case: UseCase):
         self.use_case = use_case
 
-    def handle(self, request: LoginRequest) -> LoginResponse:
+    def handle(self, schema: LoginRequest) -> LoginResponse:
         try:
-            return self.use_case.execute(request.email, request.password)
+            return self.use_case.execute(schema)
         except DatabaseException as e:
             raise HTTPException(status_code=500, detail=f"Erro de banco de dados: {str(e)}")
         except UnauthorizedException as e:
@@ -39,7 +42,7 @@ class LoginController:
 @router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest):
     try:
-        controller = LoginController(LoginUseCase())
+        controller = LoginController(UseCase())
         return controller.handle(request)
     except HTTPException as e:
         raise e
