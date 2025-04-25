@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Security
 from app.core.permissions import RequirePermission
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
@@ -10,6 +10,7 @@ from app.helpers.utils.encrypt import Encrypt
 from app.infra.repository import Repository
 from app.schemas.create_user import CreateUserRequest, CreateUserResponse
 from app.helpers.exceptions.exceptions import DatabaseException, UnauthorizedException, DuplicatedException
+from app.schemas.token import TokenUser
 
 router = APIRouter()
 
@@ -68,8 +69,9 @@ class Controller:
 @router.post("/users", response_model=CreateUserResponse, status_code=201)
 def create_user(
     request: CreateUserRequest,
-    user: User = RequirePermission(PermissionLevelEnum.ADMIN) 
+    user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
 ):
+
     try:
         controller = Controller(UseCase())
         return controller.handle(request)
