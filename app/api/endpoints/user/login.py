@@ -24,7 +24,7 @@ class UseCase:
         token = JWToken.encode(user_id=user.user_id, permission=user.permission)
         return LoginResponse(token=token)
 
-class LoginController:
+class Controller:
     def __init__(self, use_case: UseCase):
         self.use_case = use_case
 
@@ -42,7 +42,7 @@ class LoginController:
 @router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest):
     try:
-        controller = LoginController(UseCase())
+        controller = Controller(UseCase())
         return controller.handle(request)
     except HTTPException as e:
         raise e
