@@ -21,7 +21,7 @@ class UseCase:
     def __init__(self):
         self.repository = Repository(user_repo=True)
         self.user_repo = self.repository.user_repo
-
+        
     def execute(self, schema: CreateUserRequest) -> CreateUserResponse:
         
         verify_user_exists = self.user_repo.get_user_by_email(schema.email)
