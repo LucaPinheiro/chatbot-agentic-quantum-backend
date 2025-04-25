@@ -1,30 +1,16 @@
-from fastapi import Header, HTTPException, status, Depends
-from typing import Optional, Callable
-
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.core.jwtoken import JWToken
-from app.domain.entities.user import User
-
-
-from fastapi import Header, HTTPException, status, Depends
-from typing import Optional, Callable
-
-from app.core.jwtoken import JWToken
-from app.domain.entities.user import User
 from app.helpers.enums.enums import PermissionLevelEnum
 from app.schemas.token import TokenUser
 
+auth_scheme = HTTPBearer(auto_error=True)
 
 async def manage_user_permission(
-    authorization: Optional[str] = Header(None),
+    credentials: HTTPAuthorizationCredentials = Depends(auth_scheme),
     required_permission: PermissionLevelEnum = PermissionLevelEnum.USER
-) -> User:
-    if not authorization:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token ausente"
-        )
-
-    token = authorization.replace("Bearer ", "")
+) -> TokenUser:
+    token = credentials.credentials
     decoded = JWToken.decode(token)
 
     if not decoded:
@@ -45,8 +31,7 @@ async def manage_user_permission(
     return TokenUser(id=user_id, permission=permission)
 
 
-
-def RequirePermission(required_permission: PermissionLevelEnum) -> Callable:
-    async def wrapper(authorization: Optional[str] = Header(None)):
-        return await manage_user_permission(authorization, required_permission)
-    return Depends(wrapper)
+def RequirePermission(required_permission: PermissionLevelEnum):
+    async def dependency(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)):
+        return await manage_user_permission(credentials, required_permission)
+    return dependency 

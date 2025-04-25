@@ -17,9 +17,6 @@ class LoginUseCase:
         user = self.user_repo.get_user_by_email(email)
         if not user:
             raise UnauthorizedException("Usuário não encontrado")
-        
-        if not Encrypt.verify_password(password, user.password):
-            raise UnauthorizedException("Senha inválida")
 
         token = JWToken.encode(user_id=user.user_id, permission=user.permission)
         return LoginResponse(token=token)
