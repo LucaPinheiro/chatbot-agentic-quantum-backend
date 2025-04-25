@@ -18,7 +18,7 @@ class UserRepositoryPostgres(IUserRepository):
         
     
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        user = self.db.query(User).filter(User.id == user_id).first()
+        user = self.db.query(User).filter(User.user_id == user_id).first()
         return User.from_orm(user) if user else None
     
     def get_user_by_email(self, email: str) -> Optional[User]:

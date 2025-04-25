@@ -5,16 +5,7 @@ class MainException(Exception):
 
     def __init__(self, message):
         self.message = message
-        super().__init__(self.message)
-
-
-class UnauthorizedAccess(MainException):
-    """
-    Exception raised when the jwt token is invalid or expired.
-    """
-
-    def __init__(self, message):
-        super().__init__(message)
+        super().__init__(self.message)\
 
 
 class InvalidFileFormat(MainException):
