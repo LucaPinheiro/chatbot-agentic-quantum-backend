@@ -33,6 +33,26 @@ def create_db_tables():
                     permission=3
                 )
                 session.add(admin)
+
+                professor = User(
+                    user_id="professor-id-001",
+                    name="Professor Teste",
+                    email="professor@example.com",
+                    password=Encrypt.hash_password("professor123"),
+                    created_at=datetime.now(),
+                    permission=2
+                )
+                session.add(professor)
+
+                aluno = User(
+                    user_id="aluno-id-001",
+                    name="Aluno Teste",
+                    email="aluno@example.com",
+                    password=Encrypt.hash_password("aluno123"),
+                    created_at=datetime.now(),
+                    permission=1
+                )
+                session.add(aluno)
                 session.commit()
                 print("Usuário admin criado com sucesso.")
             else:
