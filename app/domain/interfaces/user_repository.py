@@ -6,7 +6,7 @@ from app.domain.entities.user import User
 
 class IUserRepository(ABC):
     @abstractmethod
-    def get_user_by_id(self, user_id: str) -> Optional[User]:
+    def get_user_by_id(self, user_id: str) -> User:
         pass
 
     @abstractmethod
