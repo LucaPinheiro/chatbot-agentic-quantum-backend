@@ -18,12 +18,8 @@ class UserRepositoryPostgres(IUserRepository):
 
     def get_user_by_id(self, user_id: str) -> User:
         user = self.db.query(UserModel).filter(UserModel.user_id == user_id).first()
-        if not user:
-            raise NotFoundException("Usuário não encontrado pelo ID")
         return User.from_orm(user)
 
     def get_user_by_email(self, email: str) -> User:
         user = self.db.query(UserModel).filter(UserModel.email == email).first()
-        if not user:
-            raise NotFoundException("Usuário não encontrado pelo email")
         return User.from_orm(user)
