@@ -20,7 +20,7 @@ class AccessClassEnum(Enum):
     
     
 class PermissionLevelEnum(IntEnum):
-    USER = 1 # aluno
-    MODERATOR = 2 # professor
+    STUDENT = 1 # aluno
+    PROFESSOR = 2 # professor
     ADMIN = 3 # admin
 
