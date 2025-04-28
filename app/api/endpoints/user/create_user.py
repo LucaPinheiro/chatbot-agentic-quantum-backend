@@ -53,7 +53,16 @@ class Controller:
     def __init__(self, use_case: UseCase):
         self.use_case = use_case
 
-    def handle(self, request: CreateUserRequest) -> CreateUserResponse:
+    def handle(self, request: CreateUserRequest, user) -> CreateUserResponse:
+        
+        if user.permission == PermissionLevelEnum.PROFESSOR:
+            
+            if request.permission == PermissionLevelEnum.ADMIN:
+                raise UnauthorizedException("Usuário não autorizado a criar um admin")
+            if request.permission == PermissionLevelEnum.PROFESSOR:
+                raise UnauthorizedException("Usuário não autorizado a criar um moderador")
+            
+        
         try:
             return self.use_case.execute(request)
         except DatabaseException as e:
@@ -69,12 +78,12 @@ class Controller:
 @router.post("/users", response_model=CreateUserResponse, status_code=201)
 def create_user(
     request: CreateUserRequest,
-    user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
+    user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN or PermissionLevelEnum.PROFESSOR))
 ):
 
     try:
         controller = Controller(UseCase())
-        return controller.handle(request)
+        return controller.handle(request, user)
     except HTTPException as e:
         raise e
     except Exception as e:
