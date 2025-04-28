@@ -54,7 +54,7 @@ class Controller:
 async def get_user(
     email: Optional[str] = None, 
     user_id: Optional[str] = None,
-    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.USER))
+    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
