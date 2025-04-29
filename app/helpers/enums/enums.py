@@ -1,13 +1,6 @@
 from enum import Enum
 from enum import IntEnum
 
-
-class UserTypeEnum(Enum):
-    ADMIN = "Admin"
-    PROFESSOR = "Professor"
-    STUDENT = "Estudante"
-
-
 class UserStatusEnum(Enum):
     ACTIVE = "Ativo"
     INACTIVE = "Inativo"
