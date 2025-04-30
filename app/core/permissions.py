@@ -8,7 +8,7 @@ auth_scheme = HTTPBearer(auto_error=True)
 
 async def manage_user_permission(
     credentials: HTTPAuthorizationCredentials = Depends(auth_scheme),
-    required_permission: PermissionLevelEnum = PermissionLevelEnum.USER
+    required_permission: PermissionLevelEnum = PermissionLevelEnum.STUDENT
 ) -> TokenUser:
     token = credentials.credentials
     decoded = JWToken.decode(token)
