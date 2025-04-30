@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
@@ -23,3 +24,7 @@ class UserRepositoryPostgres(IUserRepository):
     def get_user_by_email(self, email: str) -> User:
         user = self.db.query(UserModel).filter(UserModel.email == email).first()
         return User.from_orm(user)
+
+    def get_all_users(self) -> List[User]:
+        users = self.db.query(UserModel).all()
+        return [User.from_orm(user) for user in users]
