@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⏬ Checkout Repository
+      - name: ⬇️ Checkout Repository
         uses: actions/checkout@v3
 
       - name: ⚙️ Set up Python
@@ -31,7 +31,7 @@ jobs:
         with:
           terraform_version: 1.5.7
 
-      - name: 🧪 Install Lambda deps and build ZIP
+      - name: 🥪 Install Lambda deps and build ZIP
         run: |
           cd lambda
           pip install -r requirements.txt -t .
@@ -45,11 +45,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: sa-east-1
 
-      - name: 🧱 Terraform Init
+      - name: 🥱 Delete IAM Role manually if exists (DEV ONLY)
+        if: env.DESTROY_BEFORE_APPLY == 'true'
+        run: |
+          aws iam delete-role --role-name lambda-chatbot-summary-role || echo "Role inexistente ou em uso"
+
+      - name: 🛡 Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      - name: 🧨 Terraform Destroy (optional)
+      - name: 💨 Terraform Destroy (optional)
         if: env.DESTROY_BEFORE_APPLY == 'true'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
@@ -58,7 +63,7 @@ jobs:
             -var="dynamo_table_name=session-chatbot" \
             -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
 
-      - name: 🧪 Terraform Validate
+      - name: 🥪 Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
