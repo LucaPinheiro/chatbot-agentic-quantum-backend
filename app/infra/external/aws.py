@@ -161,17 +161,20 @@ class SQSResources:
     def send_message(self, sqs_message: SQSMessage) -> bool:
         try:
             if settings.stage == StageEnum.test:
+                print("[TEST MODE] SQS message not sent.")
                 return True
+
             response = self.sqs.send_message(
                 QueueUrl=settings.sqs_queue_url,
-                MessageGroupId=sqs_message.message_group_id.name,
+                MessageGroupId=sqs_message.message_group_id,
                 MessageBody=sqs_message.to_json()
             )
-            print(f"MessageId: {response.get('MessageId')} was sent to the queue")
-            return response.get("MessageId") is not None
+            print(f"✅ Message sent to SQS: {response.get('MessageId')}")
+            return True
         except Exception as e:
-            print(e)
+            print(f"❌ Failed to send SQS message: {e}")
             return False
+
 
 
 class RekognitionResources:
