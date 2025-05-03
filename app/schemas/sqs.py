@@ -1,23 +1,21 @@
 import json
 from pydantic import BaseModel
-from typing import Dict, Any
-
-
-class SQSEvent:
-    def __init__(self, body: Dict[str, Any]):
-        self.body = json.loads(body["Records"][0]["body"])
-
-    def to_json(self) -> str:
-        return json.dumps(self.__dict__)
-
-    def to_dict(self) -> dict:
-        return self.__dict__
+from typing import Literal, Optional
+from datetime import datetime
 
 
 class SQSMessage(BaseModel):
-    message_id: str
-    message_body: str
+    session_id: str
+    summary_cutoff: Optional[str]
+    message_group_id: Literal["summarization"]
 
     def to_json(self) -> str:
         return self.model_dump_json()
 
+
+class SQSEvent:
+    def __init__(self, raw_event: dict):
+        self.records = [json.loads(r["body"]) for r in raw_event["Records"]]
+
+    def __iter__(self):
+        return iter(self.records)
