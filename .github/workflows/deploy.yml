@@ -1,0 +1,62 @@
+name: Deploy Terraform to AWS
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "terraform/**"
+      - ".github/workflows/deploy.yml"
+
+env:
+  TF_WORKING_DIR: terraform
+
+jobs:
+  terraform:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: ⏬ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 🧪 Install Lambda deps and build ZIP
+        run: |
+          cd ../lambda
+          pip install -r requirements.txt -t .
+          zip -r ../${{ env.TF_WORKING_DIR }}/summarize_lambda.zip .
+          cd ../${{ env.TF_WORKING_DIR }}
+
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: sa-east-1
+
+      - name: 🧱 Terraform Init
+        run: terraform init
+
+      - name: 🧪 Terraform Validate
+        run: terraform validate
+
+      - name: 🔍 Terraform Plan
+        run: terraform plan \
+          -var="region=sa-east-1" \
+          -var="dynamo_table_name=session-chatbot" \
+          -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
+
+      - name: 🚀 Terraform Apply
+        run: terraform apply -auto-approve \
+          -var="region=sa-east-1" \
+          -var="dynamo_table_name=session-chatbot" \
+          -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
