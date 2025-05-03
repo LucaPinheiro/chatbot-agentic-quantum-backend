@@ -52,9 +52,10 @@ jobs:
       - name: 🧨 Terraform Destroy (optional)
         if: env.DESTROY_BEFORE_APPLY == 'true'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -auto-approve \
-          -var="region=sa-east-1" \
-          -var="dynamo_table_name=session-chatbot" \
+        run: >
+          terraform destroy -auto-approve
+          -var="region=sa-east-1"
+          -var="dynamo_table_name=session-chatbot"
           -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
 
       - name: 🧪 Terraform Validate
@@ -63,14 +64,16 @@ jobs:
 
       - name: 🔍 Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan \
-          -var="region=sa-east-1" \
-          -var="dynamo_table_name=session-chatbot" \
+        run: >
+          terraform plan
+          -var="region=sa-east-1"
+          -var="dynamo_table_name=session-chatbot"
           -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
 
       - name: 🚀 Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve \
-          -var="region=sa-east-1" \
-          -var="dynamo_table_name=session-chatbot" \
+        run: >
+          terraform apply -auto-approve
+          -var="region=sa-east-1"
+          -var="dynamo_table_name=session-chatbot"
           -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
