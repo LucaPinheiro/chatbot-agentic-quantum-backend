@@ -10,7 +10,7 @@ on:
 
 env:
   TF_WORKING_DIR: terraform
-  DESTROY_BEFORE_APPLY: true # 👈 true para destruir tudo antes
+  DESTROY_BEFORE_APPLY: true # 👈 ajuste aqui se quiser destruir tudo antes
 
 jobs:
   terraform:
@@ -48,13 +48,6 @@ jobs:
       - name: 🧱 Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
-
-      - name: ♻️ Import IAM Role if it already exists
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform state list | grep aws_iam_role.lambda_exec_role || \
-          terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role || \
-          echo "Role já importada ou não encontrada"
 
       - name: 🧨 Terraform Destroy (optional)
         if: env.DESTROY_BEFORE_APPLY == 'true'
