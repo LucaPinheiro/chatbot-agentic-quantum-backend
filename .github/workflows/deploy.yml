@@ -45,10 +45,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: sa-east-1
 
-      - name: 🥱 Delete IAM Role manually if exists (DEV ONLY)
-        if: env.DESTROY_BEFORE_APPLY == 'true'
+      - name: 🔥 Delete IAM Role if exists (safe fallback)
         run: |
-          aws iam delete-role --role-name lambda-chatbot-summary-role || echo "Role inexistente ou em uso"
+          aws iam delete-role --role-name lambda-chatbot-summary-role || echo "Role não existia ou já removido"
 
       - name: 🛡 Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
