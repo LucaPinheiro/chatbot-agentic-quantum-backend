@@ -62,7 +62,7 @@ class CreateChatMessageUseCase:
                 message_id=session_id,
                 message_body="Resumo necessário",
                 session_id=session_id,
-                summary_cutoff=summary_cutoff  # pode ser None
+                summary_cutoff=summary_cutoff
             )
             self.sqs.send_message(message_to_send)
 
