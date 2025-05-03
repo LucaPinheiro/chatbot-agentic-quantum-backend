@@ -52,6 +52,10 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
+      - name: ♻️ Import IAM Role if it already exists
+        run: |
+          terraform state list | grep aws_iam_role.lambda_exec_role || terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role
+
       - name: 🔍 Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -var="region=sa-east-1" -var="dynamo_table_name=session-chatbot" -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
