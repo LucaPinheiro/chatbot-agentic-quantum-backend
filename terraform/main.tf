@@ -74,6 +74,10 @@ resource "aws_lambda_function" "summarize_lambda" {
       OPENAI_API_KEY = var.openai_api_key
     }
   }
+
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 
