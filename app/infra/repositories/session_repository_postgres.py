@@ -27,4 +27,4 @@ class SessionRepositoryPostgres(ISessionRepository):
         session = self.db.query(SessionModel).all()
         if not session:
             return None
-        return [Session.from_orm(session_model) for session_model in session]
+        return [Session.from_orm(session) for session in session]
