@@ -54,18 +54,19 @@ resource "aws_lambda_function" "summarize_lambda" {
   filename         = "lambda/summarize_lambda.zip"
   function_name    = "chatbot_summarize_lambda"
   role             = aws_iam_role.lambda_exec_role.arn
-handler          = "summarizer.handler"
+  handler          = "summarizer.handler"
   runtime          = "python3.11"
   source_code_hash = filebase64sha256("lambda/summarize_lambda.zip")
   timeout          = 15
 
   environment {
     variables = {
-      DYNAMO_TABLE     = var.dynamo_table_name
-      OPENAI_API_KEY   = var.openai_api_key
+      DYNAMO_TABLE   = var.dynamo_table_name
+      OPENAI_API_KEY = var.openai_api_key
     }
   }
 }
+
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.chatbot_summary_queue.arn

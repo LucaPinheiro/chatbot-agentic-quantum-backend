@@ -6,19 +6,24 @@ on:
     paths:
       - "terraform/**"
       - ".github/workflows/deploy.yml"
+      - "lambda/**"
+
 env:
   TF_WORKING_DIR: terraform
 
 jobs:
   terraform:
+    name: Terraform Apply
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash
         working-directory: ${{ env.TF_WORKING_DIR }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: ⏬ Checkout Repository
+        uses: actions/checkout@v3
 
       - name: ⚙️ Set up Python
         uses: actions/setup-python@v4
@@ -32,10 +37,10 @@ jobs:
 
       - name: 🧪 Install Lambda deps and build ZIP
         run: |
-          pushd ../lambda
-          pip install --no-cache-dir -r requirements.txt -t .
-          zip -r ../terraform/lambda/summarize_lambda.zip .
-          popd
+          cd ../lambda
+          pip install -r requirements.txt -t .
+          zip -r ../terraform/lambda/summarize_lambda.zip . 
+          cd ../${{ env.TF_WORKING_DIR }}
 
       - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
