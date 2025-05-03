@@ -62,10 +62,12 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
-      - name: ♻️ Import existing IAM Role
+      - name: ♻️ Import existing IAM Role if not in state
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role || echo "Role já importado ou não encontrado"
+          terraform show -no-color > /dev/null 2>&1 || terraform init
+          terraform state list | grep aws_iam_role.lambda_exec_role \
+            || terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role
 
       - name: 🔍 Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
