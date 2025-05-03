@@ -1,0 +1,13 @@
+from pydantic import BaseModel, Field
+from typing import Literal
+import datetime
+
+class CreateChatMessageRequest(BaseModel):
+    message: str = Field(..., example="O que é superposição?")
+    role: Literal["user", "system"] = Field(..., example="user")
+    timestamp: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    tokens: int = Field(..., example=12)
+
+class CreateChatMessageResponse(BaseModel):
+    status: str = "success"
+    saved_at: datetime.datetime
