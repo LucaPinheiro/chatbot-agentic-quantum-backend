@@ -55,8 +55,8 @@ jobs:
       - name: ♻️ Import IAM Role if it already exists
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform state list | grep aws_iam_role.lambda_exec_role || \
-          terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role
+          terraform init -backend=false  # força o state local, necessário pro import funcionar sozinho
+          terraform import aws_iam_role.lambda_exec_role lambda-chatbot-summary-role || echo "Role já está no estado ou erro ignorado"
 
       - name: 🔍 Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
