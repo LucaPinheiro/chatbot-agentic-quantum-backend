@@ -37,7 +37,11 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Effect  = "Allow"
       },
       {
-        Action = "sqs:ReceiveMessage",
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes"
+        ],
         Resource = aws_sqs_queue.chatbot_summary_queue.arn,
         Effect  = "Allow"
       },
