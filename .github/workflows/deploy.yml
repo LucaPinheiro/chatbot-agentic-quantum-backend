@@ -37,8 +37,9 @@ jobs:
 
       - name: 🧪 Install Lambda deps and build ZIP
         run: |
-          cd ../lambda
+          cd lambda
           pip install -r requirements.txt -t .
+          mkdir -p ../terraform/lambda
           zip -r ../terraform/lambda/summarize_lambda.zip . 
           cd ../${{ env.TF_WORKING_DIR }}
 
