@@ -20,6 +20,7 @@ class SummarizationService:
             pk = f"session#{session_id}"
 
             items = self._fetch_all_items(pk)
+            print("🔍 Itens recebidos:", items)
             messages = self._filter_messages(items, cutoff)
             if not messages:
                 continue
