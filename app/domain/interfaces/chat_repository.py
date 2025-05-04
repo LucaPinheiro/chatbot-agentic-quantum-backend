@@ -18,3 +18,7 @@ class IChatRepository(ABC):
     @abstractmethod
     def get_summary(self, session_id: str) -> Optional[str]:
         pass
+
+    @abstractmethod
+    def get_timestamp_from_last_summary(self, session_id: str) -> Optional[str]:
+        pass
