@@ -11,29 +11,23 @@ from app.infra.repository import Repository
 from app.helpers.exceptions.exceptions import NotFoundException
 from app.schemas.create_chat_message import CreateChatMessageRequest, CreateChatMessageResponse
 from app.schemas.token import TokenUser
-
-router = APIRouter()
-
 from app.schemas.sqs import SQSMessage
 from app.infra.external.aws import SQSResources
 
-MESSAGE_SUMMARY_THRESHOLD = 10  # Você pode mover para settings se quiser
+router = APIRouter()
+
+MESSAGE_SUMMARY_THRESHOLD = 10  # Pode ser movido para config se desejar
+
 
 class CreateChatMessageUseCase:
-    Repository: Repository
-    session_repo: ISessionRepository
-    chat_repo: IChatRepository
-
     def __init__(self):
         self.repo = Repository(session_repo=True, user_repo=True, chat_repo=True)
-        self.session_repo = self.repo.session_repo
-        self.chat_repo = self.repo.chat_repo
+        self.session_repo: ISessionRepository = self.repo.session_repo
+        self.chat_repo: IChatRepository = self.repo.chat_repo
         self.sqs = SQSResources()
 
     def execute(self, session_id: str, schema: CreateChatMessageRequest) -> CreateChatMessageResponse:
         session = self.session_repo.get_session_by_id(session_id)
-        print(session)
-        print(session.user_id)
         if not session:
             raise NotFoundException("Sessão não encontrada.")
 
@@ -49,18 +43,26 @@ class CreateChatMessageUseCase:
             type="message"
         )
 
-        self.repo.chat_repo.save_message(message)
+        self.chat_repo.save_message(message)
 
-        # 🔎 Verifica se é hora de disparar sumarização
-        history = self.repo.chat_repo.get_session_message_history(session_id)
-        summary_cutoff = self.repo.chat_repo.get_summary(session_id)
+        history = self.chat_repo.get_session_message_history(session_id)
+        print("📜 Histórico de mensagens:", history)
+
+        summary_cutoff = self.chat_repo.get_timestamp_from_last_summary(session_id)
+        print("📌 Timestamp do último resumo:", summary_cutoff)
 
         if summary_cutoff:
-            filtered = [m for m in history if m.timestamp > datetime.datetime.fromisoformat(summary_cutoff)]
-            print(len(filtered), "AQUIIII")
+            try:
+                cutoff_dt = datetime.datetime.fromisoformat(summary_cutoff)
+                filtered = [m for m in history if m.timestamp > cutoff_dt]
+                print(f"[FILTRADO POR DATA] {len(filtered)} mensagens após {cutoff_dt}")
+            except ValueError:
+                print("⚠️ summary_cutoff com formato inválido:", summary_cutoff)
+                filtered = history
         else:
+            print("[SEM RESUMO ANTERIOR] Usando todas as mensagens")
             filtered = history
-        print(len(filtered), "AQUIIII")
+
         if len(filtered) >= MESSAGE_SUMMARY_THRESHOLD:
             message_to_send = SQSMessage(
                 session_id=session_id,
@@ -68,10 +70,9 @@ class CreateChatMessageUseCase:
                 message_group_id="summarization"
             )
             self.sqs.send_message(message_to_send)
+            print("📤 Mensagem enviada à fila SQS para sumarização")
 
         return CreateChatMessageResponse(saved_at=datetime.datetime.now(datetime.timezone.utc))
-
-
 
 
 class CreateChatMessageController:
@@ -85,8 +86,8 @@ class CreateChatMessageController:
             raise HTTPException(status_code=404, detail=str(e))
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro inesperado: {str(e)}")
-        
-        
+
+
 @router.post("/chat", response_model=CreateChatMessageResponse)
 def create_chat_message(
     session_id: str,
