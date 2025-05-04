@@ -1,83 +1,83 @@
-# name: Deploy Terraform to AWS
+name: Deploy Terraform to AWS
 
-# on:
-#   push:
-#     branches: [dev]
-#     paths:
-#       - "terraform/**"
-#       - ".github/workflows/deploy.yml"
-#       - "lambda/**"
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "terraform/**"
+      - ".github/workflows/deploy.yml"
+      - "lambda/**"
 
-# env:
-#   TF_WORKING_DIR: terraform
-#   DESTROY_BEFORE_APPLY: true
+env:
+  TF_WORKING_DIR: terraform
+  DESTROY_BEFORE_APPLY: true
 
-# jobs:
-#   terraform:
-#     name: Terraform Apply
-#     runs-on: ubuntu-latest
+jobs:
+  terraform:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: ⬇️ Checkout Repository
-#         uses: actions/checkout@v3
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v3
 
-#       - name: ⚙️ Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: "3.11"
+      - name: ⚙️ Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-#       - name: 📦 Install Terraform
-#         uses: hashicorp/setup-terraform@v3
-#         with:
-#           terraform_version: 1.5.7
+      - name: 📦 Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
 
-#       - name: 🥪 Install Lambda deps and build ZIP
-#         run: |
-#           cd lambda
-#           pip install -r requirements.txt -t .
-#           mkdir -p ../terraform/lambda
-#           zip -r ../terraform/lambda/summarize_lambda.zip .
+      - name: 🥪 Install Lambda deps and build ZIP
+        run: |
+          cd lambda
+          pip install -r requirements.txt -t .
+          mkdir -p ../terraform/lambda
+          zip -r ../terraform/lambda/summarize_lambda.zip .
 
-#       - name: 🔐 Configure AWS Credentials
-#         uses: aws-actions/configure-aws-credentials@v2
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: sa-east-1
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: sa-east-1
 
-#       - name: 🔥 Delete IAM Role if exists (safe fallback)
-#         run: |
-#           aws iam delete-role --role-name lambda-chatbot-summary-role || echo "Role não existia ou já removido"
+      - name: 🔥 Delete IAM Role if exists (safe fallback)
+        run: |
+          aws iam delete-role --role-name lambda-chatbot-summary-role || echo "Role não existia ou já removido"
 
-#       - name: 🛡 Terraform Init
-#         working-directory: ${{ env.TF_WORKING_DIR }}
-#         run: terraform init
+      - name: 🛡 Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
 
-#       - name: 💨 Terraform Destroy (optional)
-#         if: env.DESTROY_BEFORE_APPLY == 'true'
-#         working-directory: ${{ env.TF_WORKING_DIR }}
-#         run: |
-#           terraform destroy -auto-approve \
-#             -var="region=sa-east-1" \
-#             -var="dynamo_table_name=session-chatbot" \
-#             -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
+      - name: 💨 Terraform Destroy (optional)
+        if: env.DESTROY_BEFORE_APPLY == 'true'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform destroy -auto-approve \
+            -var="region=sa-east-1" \
+            -var="dynamo_table_name=session-chatbot" \
+            -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
 
-#       - name: 🥪 Terraform Validate
-#         working-directory: ${{ env.TF_WORKING_DIR }}
-#         run: terraform validate
+      - name: 🥪 Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
 
-#       - name: 🔍 Terraform Plan
-#         working-directory: ${{ env.TF_WORKING_DIR }}
-#         run: |
-#           terraform plan \
-#             -var="region=sa-east-1" \
-#             -var="dynamo_table_name=session-chatbot" \
-#             -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
+      - name: 🔍 Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var="region=sa-east-1" \
+            -var="dynamo_table_name=session-chatbot" \
+            -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
 
-#       - name: 🚀 Terraform Apply
-#         working-directory: ${{ env.TF_WORKING_DIR }}
-#         run: |
-#           terraform apply -auto-approve \
-#             -var="region=sa-east-1" \
-#             -var="dynamo_table_name=session-chatbot" \
-#             -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
+      - name: 🚀 Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform apply -auto-approve \
+            -var="region=sa-east-1" \
+            -var="dynamo_table_name=session-chatbot" \
+            -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
