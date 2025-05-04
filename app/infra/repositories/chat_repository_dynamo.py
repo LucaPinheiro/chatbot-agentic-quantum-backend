@@ -47,3 +47,12 @@ class ChatRepositoryDynamo(IChatRepository):
     def get_summary(self, session_id: str) -> Optional[str]:
         item = self.dynamo.get(partition_key=f"session#{session_id}", sort_key="summary")
         return item.get("summary") if item else None
+
+    def get_timestamp_from_last_summary(self, session_id: str) -> Optional[str]:
+        item = self.dynamo.get(
+            partition_key=f"session#{session_id}",
+            sort_key="summary"
+        )
+        if item and "timestamp" in item:
+            return item["timestamp"]
+        return None
