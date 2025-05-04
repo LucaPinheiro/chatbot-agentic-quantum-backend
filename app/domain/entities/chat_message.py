@@ -10,6 +10,7 @@ class ChatMessage(BaseModel):
     role: Literal["user", "assistant", "system"]
     message: str
     tokens: int
+    type: Literal["message", "summary"] = Field(default="message", const=True)
 
     @property
     def pk(self) -> str:
@@ -25,5 +26,7 @@ class ChatMessage(BaseModel):
             "SK": self.sk,
             "role": self.role,
             "message": self.message,
-            "tokens": self.tokens
+            "tokens": self.tokens,
+            "type": self.type,
+            "timestamp": self.timestamp.isoformat()
         }
