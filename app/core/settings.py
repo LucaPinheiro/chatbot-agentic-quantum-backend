@@ -65,6 +65,8 @@ class Settings(BaseSettings):
     dynamodb_table_messages: str = ""
 
     # ─────────────── LLM / RAG / Embeddings ───────────────
+    openai_api_key: str = ""
+    
     use_bedrock: bool = False
     use_local_model: bool = True
     bedrock_model_id: str = ""
