@@ -22,7 +22,14 @@ class SummarizationService:
             if not messages:
                 continue
 
-            prompt = "\n".join([f"{m['role']}: {m['message']}" for m in messages])
+            previous_summary = self._fetch_previous_summary(pk)
+            conversation = "\n".join([f"{m['role']}: {m['message']}" for m in messages])
+
+            if previous_summary:
+                prompt = f"Resumo anterior:\n{previous_summary}\n\nNovas mensagens:\n{conversation}"
+            else:
+                prompt = conversation
+
             summary = self._generate_summary(prompt)
             self._save_summary(pk, summary)
 
@@ -31,6 +38,10 @@ class SummarizationService:
     def _fetch_all_items(self, pk):
         response = self.dynamo.query(KeyConditionExpression=Key("PK").eq(pk))
         return response["Items"]
+
+    def _fetch_previous_summary(self, pk):
+        response = self.dynamo.get_item(Key={"PK": pk, "SK": "summary"})
+        return response.get("Item", {}).get("summary")
 
     def _filter_messages(self, items, cutoff):
         items = sorted(items, key=lambda x: x["SK"])
@@ -44,8 +55,14 @@ class SummarizationService:
             model="gpt-3.5-turbo",
             temperature=0.3,
             messages=[
-                {"role": "system", "content": "Resuma didaticamente esse trecho da conversa para monitoramento pedagógico."},
-                {"role": "user", "content": conversation}
+                {
+                    "role": "system",
+                    "content": "Resuma didaticamente esse trecho da conversa para monitoramento pedagógico."
+                },
+                {
+                    "role": "user",
+                    "content": conversation
+                }
             ]
         )
         return response.choices[0].message.content
@@ -58,7 +75,6 @@ class SummarizationService:
             "summary": summary_text,
             "timestamp": datetime.now(tz=timezone.utc).isoformat()
         })
-
 
 def handler(event, context):
     service = SummarizationService()
