@@ -7,7 +7,7 @@ class CreateChatMessageRequest(BaseModel):
     role: Literal["user", "system"] = Field(..., example="user")
     timestamp: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
     tokens: int = Field(..., example=12)
-    type: Literal["message", "summary"] = Field(default="message", const=True)
+    type: Literal["message", "summary"] = Field(default="message")
 
 class CreateChatMessageResponse(BaseModel):
     status: str = "success"
