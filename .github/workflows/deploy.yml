@@ -45,40 +45,41 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: sa-east-1
 
-      - name: 🧹 Cleanup pré-Terraform (Lambda e IAM Role)
+      - name: 🧹 Delete IAM Role if exists (safe fallback)
         run: |
-          set -e
-          echo "🔄 Apagando Lambda function se existir..."
-          aws lambda delete-function --function-name chatbot_summarize_lambda || echo "🔸 Lambda não existia"
-
-          echo "🔄 Apagando IAM Role se existir..."
           ROLE_NAME=lambda-chatbot-summary-role
 
-          # Detach managed policies
-          POLICIES=$(aws iam list-attached-role-policies --role-name $ROLE_NAME --query 'AttachedPolicies[].PolicyArn' --output text 2>/dev/null || true)
-          for policy_arn in $POLICIES; do
+          echo "▶️ Verificando políticas vinculadas ao role: $ROLE_NAME"
+          aws iam list-attached-role-policies --role-name $ROLE_NAME --query 'AttachedPolicies[].PolicyArn' --output text | while read -r policy_arn; do
             echo "🔸 Detaching $policy_arn"
             aws iam detach-role-policy --role-name $ROLE_NAME --policy-arn "$policy_arn"
           done
 
-          # Delete inline policy
+          echo "▶️ Removendo inline policy (se existir)"
           aws iam delete-role-policy --role-name $ROLE_NAME --policy-name lambda-chatbot-policy || echo "🔸 Inline policy não encontrada"
 
-          # Delete role
-          aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role não existia"
+          echo "▶️ Apagando o role"
+          aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role já foi apagado"
 
-      - name: 🔥 Delete Event Source Mapping (se existir)
+      - name: 🧹 Delete Lambda Event Source Mapping (if exists)
         run: |
+          FUNCTION_NAME="chatbot_summarize_lambda"
+          ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
+          REGION="sa-east-1"
+          SQS_ARN="arn:aws:sqs:$REGION:$ACCOUNT_ID:chatbot-summarization-queue.fifo"
+
+          echo "🔍 Buscando mappings existentes para função $FUNCTION_NAME..."
           UUID=$(aws lambda list-event-source-mappings \
-            --function-name chatbot_summarize_lambda \
-            --event-source-arn arn:aws:sqs:sa-east-1:${{ secrets.AWS_ACCOUNT_ID }}:chatbot-summarization-queue.fifo \
-            --query 'EventSourceMappings[0].UUID' --output text)
+            --function-name "$FUNCTION_NAME" \
+            --event-source-arn "$SQS_ARN" \
+            --query 'EventSourceMappings[0].UUID' \
+            --output text)
 
           if [ "$UUID" != "None" ]; then
-            echo "🗑️ Deletando mapping antigo $UUID"
+            echo "🗑️ Apagando mapeamento antigo UUID=$UUID"
             aws lambda delete-event-source-mapping --uuid "$UUID"
           else
-            echo "✅ Nenhum mapping existente encontrado"
+            echo "✅ Nenhum mapeamento existente encontrado."
           fi
 
       - name: 🛡 Terraform Init
