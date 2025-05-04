@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from uuid import uuid4
 from pydantic import BaseModel, Field
 from enum import Enum
@@ -8,9 +8,12 @@ class ChatMessage(BaseModel):
     session_id: str
     timestamp: datetime
     role: Literal["user", "assistant", "system"]
+    group_id: Optional[str]
+    class_id: Optional[str]
+    user_id: Optional[str]
     message: str
     tokens: int
-    type: Literal["message", "summary"] = Field(default="message", const=True)
+    type: Literal["message", "summary"] = Field(default="message")
 
     @property
     def pk(self) -> str:
@@ -25,6 +28,9 @@ class ChatMessage(BaseModel):
             "PK": self.pk,
             "SK": self.sk,
             "role": self.role,
+            "group_id": self.group_id,
+            "class_id": self.class_id,
+            "user_id": self.user_id,
             "message": self.message,
             "tokens": self.tokens,
             "type": self.type,
