@@ -32,6 +32,8 @@ class CreateChatMessageUseCase:
 
     def execute(self, session_id: str, schema: CreateChatMessageRequest) -> CreateChatMessageResponse:
         session = self.session_repo.get_session_by_id(session_id)
+        print(session)
+        print(session.user_id)
         if not session:
             raise NotFoundException("Sessão não encontrada.")
 
