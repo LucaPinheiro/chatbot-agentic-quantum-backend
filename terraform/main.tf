@@ -60,6 +60,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 }
 
 resource "aws_lambda_function" "summarize_lambda" {
+  depends_on = [aws_iam_role_policy.lambda_policy]
   filename         = "lambda/summarize_lambda.zip"
   function_name    = "chatbot_summarize_lambda"
   role             = aws_iam_role.lambda_exec_role.arn
