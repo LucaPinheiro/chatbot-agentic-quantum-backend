@@ -67,6 +67,20 @@ jobs:
           # Delete role
           aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role não existia"
 
+      - name: 🔥 Delete Event Source Mapping (se existir)
+        run: |
+          UUID=$(aws lambda list-event-source-mappings \
+            --function-name chatbot_summarize_lambda \
+            --event-source-arn arn:aws:sqs:sa-east-1:${{ secrets.AWS_ACCOUNT_ID }}:chatbot-summarization-queue.fifo \
+            --query 'EventSourceMappings[0].UUID' --output text)
+
+          if [ "$UUID" != "None" ]; then
+            echo "🗑️ Deletando mapping antigo $UUID"
+            aws lambda delete-event-source-mapping --uuid "$UUID"
+          else
+            echo "✅ Nenhum mapping existente encontrado"
+          fi
+
       - name: 🛡 Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init

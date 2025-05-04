@@ -90,4 +90,9 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   batch_size       = 1
 
   depends_on = [aws_lambda_function.summarize_lambda]
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
