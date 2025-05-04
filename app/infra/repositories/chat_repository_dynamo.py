@@ -18,13 +18,20 @@ class ChatRepositoryDynamo(IChatRepository):
 
     def get_session_message_history(self, session_id: str) -> List[ChatMessage]:
         raw_items = self.dynamo.query_all(f"session#{session_id}")
-        return [ChatMessage(
-            session_id=session_id,
-            timestamp=datetime.datetime.fromisoformat(item["SK"]),
-            role=item["role"],
-            message=item["message"],
-            tokens=item["tokens"]
-        ) for item in raw_items if item.get("type", "message") == "message"]
+        return [
+            ChatMessage(
+                session_id=session_id,
+                timestamp=datetime.datetime.fromisoformat(item["SK"]),
+                role=item["role"],
+                message=item["message"],
+                tokens=item["tokens"],
+                user_id=item["user_id"],
+                class_id=item["class_id"],
+                group_id=item["group_id"]
+            )
+            for item in raw_items
+            if item.get("type", "message") == "message"
+        ]
 
     def save_summary(self, session_id: str, summary: str) -> None:
         self.dynamo.put(
