@@ -44,6 +44,7 @@ class CreateChatMessageUseCase:
             message=schema.message,
             tokens=schema.tokens,
             role=schema.role,
+            type="message"
         )
 
         self.repo.chat_repo.save_message(message)
@@ -54,15 +55,15 @@ class CreateChatMessageUseCase:
 
         if summary_cutoff:
             filtered = [m for m in history if m.timestamp > datetime.datetime.fromisoformat(summary_cutoff)]
+            print(len(filtered), "AQUIIII")
         else:
             filtered = history
-
+        print(len(filtered), "AQUIIII")
         if len(filtered) >= MESSAGE_SUMMARY_THRESHOLD:
             message_to_send = SQSMessage(
-                message_id=session_id,
-                message_body="Resumo necessário",
                 session_id=session_id,
-                summary_cutoff=summary_cutoff
+                summary_cutoff=summary_cutoff,
+                message_group_id="summarization"
             )
             self.sqs.send_message(message_to_send)
 
