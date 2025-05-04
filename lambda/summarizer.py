@@ -1,17 +1,14 @@
-
-
-
 import os
-import openai
 import boto3
-from datetime import datetime
-
+from datetime import datetime, timezone
+from openai import OpenAI
 from schemas.sqs import SQSEvent
+from boto3.dynamodb.conditions import Key
 
 class SummarizationService:
     def __init__(self):
         self.dynamo = boto3.resource("dynamodb").Table(os.environ["DYNAMO_TABLE"])
-        openai.api_key = os.environ["OPENAI_API_KEY"]
+        self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
     def process(self, sqs_event):
         for record in sqs_event:
@@ -32,7 +29,8 @@ class SummarizationService:
         return {"statusCode": 200}
 
     def _fetch_all_items(self, pk):
-        return self.dynamo.query(KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(pk))["Items"]
+        response = self.dynamo.query(KeyConditionExpression=Key("PK").eq(pk))
+        return response["Items"]
 
     def _filter_messages(self, items, cutoff):
         items = sorted(items, key=lambda x: x["SK"])
@@ -42,7 +40,7 @@ class SummarizationService:
         return messages
 
     def _generate_summary(self, conversation):
-        res = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             temperature=0.3,
             messages=[
@@ -50,7 +48,7 @@ class SummarizationService:
                 {"role": "user", "content": conversation}
             ]
         )
-        return res["choices"][0]["message"]["content"]
+        return response.choices[0].message.content
 
     def _save_summary(self, pk, summary_text):
         self.dynamo.put_item(Item={
@@ -58,7 +56,7 @@ class SummarizationService:
             "SK": "summary",
             "type": "summary",
             "summary": summary_text,
-            "created_at": datetime.now(datetime.UTC).isoformat()
+            "timestamp": datetime.now(tz=timezone.utc).isoformat()
         })
 
 
