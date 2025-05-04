@@ -61,25 +61,27 @@ jobs:
           echo "▶️ Apagando o role"
           aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role já foi apagado"
 
-      - name: 🧹 Delete Lambda Event Source Mapping (if exists)
+      - name: 🧹 Delete Lambda Function and Mappings if exists
         run: |
           FUNCTION_NAME="chatbot_summarize_lambda"
-          ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           REGION="sa-east-1"
-          SQS_ARN="arn:aws:sqs:$REGION:$ACCOUNT_ID:chatbot-summarization-queue.fifo"
 
-          echo "🔍 Buscando mappings existentes para função $FUNCTION_NAME..."
-          UUID=$(aws lambda list-event-source-mappings \
-            --function-name "$FUNCTION_NAME" \
-            --event-source-arn "$SQS_ARN" \
-            --query 'EventSourceMappings[0].UUID' \
-            --output text)
+          if aws lambda get-function --function-name "$FUNCTION_NAME" --region "$REGION" > /dev/null 2>&1; then
+            echo "🔍 Função $FUNCTION_NAME existe. Limpando event source mappings..."
+            MAPPINGS=$(aws lambda list-event-source-mappings \
+              --function-name "$FUNCTION_NAME" \
+              --region "$REGION" \
+              --query 'EventSourceMappings[].UUID' --output text)
 
-          if [ "$UUID" != "None" ]; then
-            echo "🗑️ Apagando mapeamento antigo UUID=$UUID"
-            aws lambda delete-event-source-mapping --uuid "$UUID"
+            for UUID in $MAPPINGS; do
+              echo "🧨 Apagando mapeamento de evento UUID=$UUID"
+              aws lambda delete-event-source-mapping --uuid "$UUID" --region "$REGION"
+            done
+
+            echo "🗑️ Deletando função Lambda: $FUNCTION_NAME"
+            aws lambda delete-function --function-name "$FUNCTION_NAME" --region "$REGION"
           else
-            echo "✅ Nenhum mapeamento existente encontrado."
+            echo "✅ Função $FUNCTION_NAME não existe — nada a deletar."
           fi
 
       - name: 🛡 Terraform Init
