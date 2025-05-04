@@ -45,21 +45,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: sa-east-1
 
-      - name: 🧹 Force Delete IAM Role with cleanup
+      - name: 🧹 Cleanup pré-Terraform (Lambda e IAM Role)
         run: |
+          set -e
+          echo "🔄 Apagando Lambda function se existir..."
+          aws lambda delete-function --function-name chatbot_summarize_lambda || echo "🔸 Lambda não existia"
+
+          echo "🔄 Apagando IAM Role se existir..."
           ROLE_NAME=lambda-chatbot-summary-role
 
-          echo "▶️ Verificando políticas vinculadas ao role: $ROLE_NAME"
-          aws iam list-attached-role-policies --role-name $ROLE_NAME --query 'AttachedPolicies[].PolicyArn' --output text | while read -r policy_arn; do
+          # Detach managed policies
+          POLICIES=$(aws iam list-attached-role-policies --role-name $ROLE_NAME --query 'AttachedPolicies[].PolicyArn' --output text 2>/dev/null || true)
+          for policy_arn in $POLICIES; do
             echo "🔸 Detaching $policy_arn"
             aws iam detach-role-policy --role-name $ROLE_NAME --policy-arn "$policy_arn"
           done
 
-          echo "▶️ Removendo inline policy (se existir)"
+          # Delete inline policy
           aws iam delete-role-policy --role-name $ROLE_NAME --policy-name lambda-chatbot-policy || echo "🔸 Inline policy não encontrada"
 
-          echo "▶️ Apagando o role"
-          aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role já foi apagado"
+          # Delete role
+          aws iam delete-role --role-name $ROLE_NAME || echo "🔸 Role não existia"
 
       - name: 🛡 Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}

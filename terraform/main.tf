@@ -88,4 +88,6 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   function_name    = aws_lambda_function.summarize_lambda.arn
   enabled          = true
   batch_size       = 1
+
+  depends_on = [aws_lambda_function.summarize_lambda]
 }
