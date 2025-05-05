@@ -1,9 +1,9 @@
 from typing import Self, Type
 from pydantic import BaseModel
-from app.models.models import Classes
+from app.models.models import ClassModel
 
 
-class Classes(BaseModel):
+class ClassModel(BaseModel):
     class_id: str
     group_id: str
     title: str
@@ -13,7 +13,7 @@ class Classes(BaseModel):
     created_at: str
     order: int
     @classmethod  
-    def from_orm(cls, classes: Type[Classes]) -> Self:
+    def from_orm(cls, classes: Type[ClassModel]) -> Self:
         return cls(
             class_id=classes.class_id,
             group_id=classes.group_id,
@@ -24,8 +24,8 @@ class Classes(BaseModel):
             created_at=classes.created_at,
             order=classes.order
         )
-    def to_orm(self) -> Classes:
-        return Classes(
+    def to_orm(self) -> ClassModel:
+        return ClassModel(
             class_id=self.class_id,
             group_id=self.group_id,
             title=self.title,
