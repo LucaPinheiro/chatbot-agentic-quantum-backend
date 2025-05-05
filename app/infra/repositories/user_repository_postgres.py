@@ -1,4 +1,5 @@
 from typing import List
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
@@ -17,12 +18,16 @@ class UserRepositoryPostgres(IUserRepository):
         self.db.refresh(user_orm)
         return User.from_orm(user_orm)
 
-    def get_user_by_id(self, user_id: str) -> User:
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
         user = self.db.query(UserModel).filter(UserModel.user_id == user_id).first()
+        if not user:
+            return None
         return User.from_orm(user)
 
-    def get_user_by_email(self, email: str) -> User:
+    def get_user_by_email(self, email: str) -> Optional[User]:
         user = self.db.query(UserModel).filter(UserModel.email == email).first()
+        if not user:
+            return None
         return User.from_orm(user)
 
     def get_all_users(self) -> List[User]:
