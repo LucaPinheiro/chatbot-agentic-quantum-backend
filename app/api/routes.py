@@ -5,10 +5,11 @@ from app.api.endpoints.user.create_user import router as create_user_router
 from app.api.endpoints.user.login import router as login_router
 from app.api.endpoints.user.get_user_request import router as get_user_request_router
 from app.api.endpoints.user.get_all_users import router as get_all_users_router
+from app.api.endpoints.classes.get_classes_by_group import router as get_classes_by_group_router
 # from app.api.v1.endpoints.user import router as user_router
 
 routers = APIRouter()
-router_list = [health_check_router, create_user_router, login_router, get_user_request_router, get_all_users_router]
+router_list = [health_check_router, create_user_router, login_router, get_user_request_router, get_all_users_router, get_classes_by_group_router]
 
 for router in router_list:
     router.tags = routers.tags.append("v1")
