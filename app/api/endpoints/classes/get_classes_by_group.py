@@ -23,17 +23,17 @@ class UseCase:
     
     def execute(self, schema: GetClassesRequest) -> List[GetClassesResponse]:
         print(f"Buscando aulas para o grupo: {schema.group_id}")
-        classes = self.classes_repo.get_classes_by_group()
+        classes = self.classes_repo.get_classes_by_group(group_id=schema.group_id)
         return [
             GetClassesResponse(
-                class_id=classes.class_id,
-                group_id=classes.group_id,
-                title=classes.title,
-                pdf_url=classes.pdf_url,
-                status=classes.status,
-                last_access_class=classes.last_access_class,
-                created_at=classes.created_at,
-                order=classes.order
+                class_id=c.class_id,
+                group_id=c.group_id,
+                title=c.title,
+                pdf_url=c.pdf_url,
+                status=c.status,
+                last_access_class=c.last_access_class,
+                created_at=c.created_at,
+                order=c.order
             )
             for c in classes
         ]
