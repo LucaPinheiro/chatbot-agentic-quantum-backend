@@ -36,12 +36,12 @@ class Group(Base):
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
 
     user = relationship("User", back_populates="groups")
-    classes = relationship("Class", back_populates="group")
+    classes = relationship("ClassModel", back_populates="group")
     sessions = relationship("Session", back_populates="group")
 
 
-# ──────────────── Class ────────────────
-class Class(Base):
+# ──────────────── Class (renomeado para evitar conflito com palavra reservada) ────────────────
+class ClassModel(Base):
     __tablename__ = "classes"
 
     class_id = Column(String, primary_key=True)
@@ -69,7 +69,7 @@ class ClassTopic(Base):
     class_progress_percentual = Column(Integer, default=0)
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
 
-    class_ = relationship("Class", back_populates="class_topics")
+    class_ = relationship("ClassModel", back_populates="class_topics")
     user = relationship("User", back_populates="class_topics")
 
 
@@ -84,5 +84,5 @@ class Session(Base):
     created_at = Column(DateTime, nullable=False)
 
     user = relationship("User", back_populates="sessions")
-    class_ = relationship("Class", back_populates="sessions")
+    class_ = relationship("ClassModel", back_populates="sessions")
     group = relationship("Group", back_populates="sessions")

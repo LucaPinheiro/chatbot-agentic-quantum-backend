@@ -1,3 +1,4 @@
+from typing import List
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
@@ -28,3 +29,7 @@ class UserRepositoryPostgres(IUserRepository):
         if not user:
             return None
         return User.from_orm(user)
+
+    def get_all_users(self) -> List[User]:
+        users = self.db.query(UserModel).all()
+        return [User.from_orm(user) for user in users]
