@@ -39,19 +39,19 @@ class ClassModel(BaseModel):
     def to_dict(self, exclude=None) -> dict:
         if exclude is None:
             exclude = []
-            
-            classes = {
-                "class_id": self.class_id,
-                "group_id": self.group_id,
-                "title": self.title,
-                "pdf_url": self.pdf_url,
-                "status": self.status,
-                "last_access_class": self.last_access_class,
-                "created_at": self.created_at,
-                "order": self.order
-            }
-            
-            for key in exclude:
-                del classes[key]
-                
-            return classes
+        
+        classes = {
+            "class_id": self.class_id,
+            "group_id": self.group_id,
+            "title": self.title,
+            "pdf_url": self.pdf_url,
+            "status": self.status,
+            "last_access_class": self.last_access_class,
+            "created_at": self.created_at,
+            "order": self.order
+        }
+        
+        for key in exclude:
+            classes.pop(key, None)  # Use pop to safely remove keys
+        
+        return classes
