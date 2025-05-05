@@ -118,15 +118,25 @@ class DynamoDBResources:
         if begins_with:
             cond &= Key(self.cfg.sort_key).begins_with(begins_with)
 
-        kwargs = {"KeyConditionExpression": cond, **extra_kwargs}
+        kwargs = {
+            "KeyConditionExpression": cond,
+            **extra_kwargs
+        }
         if index_name:
             kwargs["IndexName"] = index_name
 
         items: List[Dict[str, Any]] = []
-        paginator = self._client.get_paginator("query")
-        for page in paginator.paginate(TableName=self.cfg.table_name, **kwargs):
-            items.extend(page["Items"])
+
+        response = self._table.query(**kwargs)
+        items.extend(response.get("Items", []))
+
+        while "LastEvaluatedKey" in response:
+            kwargs["ExclusiveStartKey"] = response["LastEvaluatedKey"]
+            response = self._table.query(**kwargs)
+            items.extend(response.get("Items", []))
+
         return [self._undecimalise(i) for i in items]
+
 
     def scan_all(self, **scan_kwargs) -> List[Dict[str, Any]]:
         paginator = self._client.get_paginator("scan")
@@ -151,17 +161,20 @@ class SQSResources:
     def send_message(self, sqs_message: SQSMessage) -> bool:
         try:
             if settings.stage == StageEnum.test:
+                print("[TEST MODE] SQS message not sent.")
                 return True
+
             response = self.sqs.send_message(
                 QueueUrl=settings.sqs_queue_url,
-                MessageGroupId=sqs_message.message_group_id.name,
+                MessageGroupId=sqs_message.message_group_id,
                 MessageBody=sqs_message.to_json()
             )
-            print(f"MessageId: {response.get('MessageId')} was sent to the queue")
-            return response.get("MessageId") is not None
+            print(f"✅ Message sent to SQS: {response.get('MessageId')}")
+            return True
         except Exception as e:
-            print(e)
+            print(f"❌ Failed to send SQS message: {e}")
             return False
+
 
 
 class RekognitionResources:

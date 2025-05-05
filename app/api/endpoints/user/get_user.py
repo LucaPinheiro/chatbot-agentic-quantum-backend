@@ -5,7 +5,7 @@ from app.domain.interfaces.user_repository import IUserRepository
 from app.helpers.enums.enums import PermissionLevelEnum
 from app.helpers.exceptions.exceptions import NotFoundException
 from app.infra.repository import Repository
-from app.schemas.get_user_request import GetUserRequest, GetUserResponse
+from app.schemas.get_user import GetUserRequest, GetUserResponse
 from app.schemas.token import TokenUser
 
 router = APIRouter()
