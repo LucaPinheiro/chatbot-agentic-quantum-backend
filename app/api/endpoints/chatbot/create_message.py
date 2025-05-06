@@ -19,7 +19,7 @@ from app.infra.external.aws import SQSResources
 
 router = APIRouter()
 
-MESSAGE_SUMMARY_THRESHOLD = 10 
+MESSAGE_SUMMARY_THRESHOLD = 8
 
 settings = load_settings()
 
@@ -57,7 +57,7 @@ class UseCase:
         history_sorted = sorted(history, key=lambda m: m.timestamp)
         print(f"📜 Total de mensagens no histórico da sessão: {len(history_sorted)}")
 
-        last_10 = history_sorted[-10:]
+        last_10 = history_sorted[-8:]
         context_messages = [{"role": m.role, "content": m.message} for m in last_10]
 
         summary_cutoff = self.chat_repo.get_timestamp_from_last_summary(session_id)
