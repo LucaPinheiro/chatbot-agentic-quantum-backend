@@ -4,9 +4,6 @@ import datetime
 
 class CreateChatMessageRequest(BaseModel):
     message: str = Field(..., example="O que é superposição?")
-    role: Literal["user", "system"] = Field(..., example="user")
-    tokens: int = Field(..., example=12)
-    type: Literal["message", "summary"] = Field(default="message")
 
 class CreateChatMessageResponse(BaseModel):
     status: str = "success"
