@@ -8,8 +8,7 @@ from app.domain.entities.chat_message import ChatMessage
 from app.domain.interfaces.chat_repository import IChatRepository
 from app.domain.interfaces.session_repository import ISessionRepository
 from app.helpers.enums.enums import PermissionLevelEnum
-from app.helpers.functions.openai_service import OpenAIService
-from app.models.models import Session as SessionModel
+from app.infra.llm.openai_service import OpenAIService
 from app.infra.repository import Repository
 from app.helpers.exceptions.exceptions import NotFoundException
 from app.schemas.create_chat_message import CreateChatMessageRequest, CreateChatMessageResponse
