@@ -45,8 +45,8 @@ class UseCase:
             group_id=session.group_id,
             timestamp=datetime.datetime.now(datetime.timezone.utc),
             message=schema.message,
-            tokens=schema.tokens,
-            role=schema.role,
+            tokens=0,
+            role="user",
             type="message"
         )
         self.chat_repo.save_message(user_msg)
