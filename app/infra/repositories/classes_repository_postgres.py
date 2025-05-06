@@ -14,5 +14,5 @@ class ClassesRepositoryPostgres(IClassesRepository):
         if not classes:
             return []
         print(f"[DEBUG] Resultado da query: {classes}")
-        print(type(group_id))  # Deve imprimir <class 'str'>
+        print(type(group_id))
         return classes
