@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.domain.interfaces.chat_repository import IChatRepository
+from app.domain.interfaces.class_topics_repository import IClassTopicsRepository
 from app.domain.interfaces.classes_repository import IClassesRepository
 from app.domain.interfaces.file_repository import IFileRepository
 from app.domain.interfaces.session_repository import ISessionRepository
@@ -13,6 +14,7 @@ from app.helpers.exceptions.exceptions import DatabaseException
 from app.infra.external.aws import DynamoConfig, DynamoDBResources
 from app.infra.mocks.user_repository_mock import UserRepoMock
 from app.infra.repositories.chat_repository_dynamo import ChatRepositoryDynamo
+from app.infra.repositories.class_topics_repository_postgres import ClassTopicsRepositoryPostgres
 from app.infra.repositories.classes_repository_postgres import ClassesRepositoryPostgres
 from app.infra.repositories.file_repository_s3 import FileRepositoryS3
 from app.infra.repositories.session_repository_postgres import SessionRepositoryPostgres
@@ -27,20 +29,21 @@ class Repository:
     session_repo: ISessionRepository
     chat_repo: IChatRepository
     classes_repo: IClassesRepository
+    class_topics_repo: IClassTopicsRepository
 
-    def __init__(self, user_repo: bool = False, file_repo: bool = False, session_repo: bool = False, chat_repo: bool = False, classes_repo: bool = False):
+    def __init__(self, user_repo: bool = False, file_repo: bool = False, session_repo: bool = False, chat_repo: bool = False, classes_repo: bool = False, class_topics_repo: bool = False):
         self.session = None
 
         if settings.stage == StageEnum.test:
             self._initialize_mock_repositories(user_repo)
         else:
-            self._initialize_real_repositories(user_repo, file_repo, session_repo, chat_repo, classes_repo)
+            self._initialize_real_repositories(user_repo, file_repo, session_repo, chat_repo, classes_repo, class_topics_repo)
 
     def _initialize_mock_repositories(self, user_repo):
         if user_repo:
             self.user_repo = UserRepoMock()
 
-    def _initialize_real_repositories(self, user_repo, file_repo, session_repo, chat_repo, classes_repo):
+    def _initialize_real_repositories(self, user_repo, file_repo, session_repo, chat_repo, classes_repo, class_topics_repo):
         self.session = self.__connect_db()
         
         if classes_repo:
@@ -54,6 +57,9 @@ class Repository:
             
         if session_repo:
             self.session_repo = SessionRepositoryPostgres(self.session)
+        
+        if class_topics_repo:
+            self.class_topics_repo = ClassTopicsRepositoryPostgres(self.session)
             
         if chat_repo:
             dynamo_config = DynamoConfig(table_name=settings.dynamodb_table_messages)
