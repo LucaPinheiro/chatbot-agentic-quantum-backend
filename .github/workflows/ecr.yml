@@ -1,8 +1,8 @@
-name: Deploy FastAPI to ECR
+name: Deploy FastAPI to Amazon ECR
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
     paths:
       - "docker/**"
       - "app/**"
@@ -16,14 +16,14 @@ env:
 
 jobs:
   deploy:
-    name: Build and Push Docker Image to ECR
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout code
+      - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔐 Configure AWS credentials
+      - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -31,7 +31,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: 📝 Login to Amazon ECR
-        id: login-ecr
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
@@ -41,8 +40,8 @@ jobs:
 
       - name: 🏷️ Tag Docker image
         run: |
-          docker tag $ECR_REPOSITORY:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: 🚀 Push Docker image to ECR
+      - name: 🚀 Push Docker image to Amazon ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
