@@ -2,7 +2,7 @@ name: Deploy FastAPI to Amazon ECR
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
     paths:
       - "docker/**"
       - "app/**"
