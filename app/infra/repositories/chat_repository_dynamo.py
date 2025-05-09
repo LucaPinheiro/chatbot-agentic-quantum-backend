@@ -56,3 +56,4 @@ class ChatRepositoryDynamo(IChatRepository):
         if item and "timestamp" in item:
             return item["timestamp"]
         return None
+
