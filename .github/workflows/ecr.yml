@@ -1,47 +1,47 @@
-name: Deploy FastAPI to Amazon ECR
+# name: Deploy FastAPI to Amazon ECR
 
-on:
-  push:
-    branches: [dev]
-    paths:
-      - "docker/**"
-      - "app/**"
-      - "requirements.txt"
-      - ".github/workflows/cd.yml"
+# on:
+#   push:
+#     branches: [dev]
+#     paths:
+#       - "docker/**"
+#       - "app/**"
+#       - "requirements.txt"
+#       - ".github/workflows/cd.yml"
 
-env:
-  AWS_REGION: sa-east-1
-  ECR_REPOSITORY: chatbot-agentic-quantum-backend
-  IMAGE_TAG: latest
+# env:
+#   AWS_REGION: sa-east-1
+#   ECR_REPOSITORY: chatbot-agentic-quantum-backend
+#   IMAGE_TAG: latest
 
-jobs:
-  deploy:
-    name: Build and Push Docker Image
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     name: Build and Push Docker Image
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
+#     steps:
+#       - name: ⬇️ Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: 🔐 Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#       - name: 🔐 Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 📝 Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com
+#       - name: 📝 Login to Amazon ECR
+#         run: |
+#           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-      - name: 🏗️ Build Docker image
-        run: |
-          docker build -t $ECR_REPOSITORY -f docker/Dockerfile .
+#       - name: 🏗️ Build Docker image
+#         run: |
+#           docker build -t $ECR_REPOSITORY -f docker/Dockerfile .
 
-      - name: 🏷️ Tag Docker image
-        run: |
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+#       - name: 🏷️ Tag Docker image
+#         run: |
+#           docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: 🚀 Push Docker image to Amazon ECR
-        run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+#       - name: 🚀 Push Docker image to Amazon ECR
+#         run: |
+#           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
