@@ -9,6 +9,7 @@ from app.api.endpoints.user.get_all_users import router as get_all_users_router
 from app.api.endpoints.classes.get_classes_by_group import router as get_classes_by_group_router
 from app.api.endpoints.chatbot.create_message import router as create_message_router
 from app.api.endpoints.chatbot.get_chat_history import router as get_chat_history_router
+from app.api.endpoints.class_topics.get_class_progress_percentual_by_class import router as get_class_progress_percentual_by_class_router
 
 routers = APIRouter()
 
@@ -21,6 +22,7 @@ router_list = [
     create_message_router,
     get_chat_history_router,
     get_classes_by_group_router,
+    get_class_progress_percentual_by_class_router,
 ]
 
 for router in router_list:
