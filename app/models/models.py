@@ -66,9 +66,7 @@ class ClassTopic(Base):
     topic = Column(String, nullable=False)
     flag = Column(Boolean, default=False)
     class_id = Column(String, ForeignKey("classes.class_id"), nullable=False)
-    class_progress_percentual = Column(Integer, default=0)
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
-
     class_ = relationship("ClassModel", back_populates="class_topics")
     user = relationship("User", back_populates="class_topics")
 
