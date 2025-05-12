@@ -20,7 +20,7 @@ class UseCase:
         
         if not Encrypt.verify_password(schema.password, user.password):
             raise UnauthorizedException("Senha inválida")
-        
+        print(f"User {user.user_id} esta pra logar in successfully.")
         token = JWToken.encode(user_id=user.user_id, permission=user.permission)
         return LoginResponse(token=token)
 
