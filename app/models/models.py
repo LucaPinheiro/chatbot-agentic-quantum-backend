@@ -36,8 +36,8 @@ class Group(Base):
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
 
     user = relationship("User", back_populates="groups")
-    classes = relationship("ClassModel", back_populates="group")
-    sessions = relationship("Session", back_populates="group")
+    classes = relationship("ClassModel", back_populates="group", cascade="all, delete-orphan")
+    sessions = relationship("Session", back_populates="group", cascade="all, delete-orphan")
 
 
 # ──────────────── Class (renomeado para evitar conflito com palavra reservada) ────────────────
@@ -54,8 +54,8 @@ class ClassModel(Base):
     order = Column(Integer)
 
     group = relationship("Group", back_populates="classes")
-    class_topics = relationship("ClassTopic", back_populates="class_")
-    sessions = relationship("Session", back_populates="class_")
+    class_topics = relationship("ClassTopic", back_populates="class_", cascade="all, delete-orphan")
+    sessions = relationship("Session", back_populates="class_", cascade="all, delete-orphan")
 
 
 # ──────────────── ClassTopic ────────────────

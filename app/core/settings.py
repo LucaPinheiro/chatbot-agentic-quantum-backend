@@ -67,13 +67,13 @@ class Settings(BaseSettings):
     # ─────────────── LLM / RAG / Embeddings ───────────────
     openai_api_key: str = ""
     
-    # use_bedrock: bool = False
-    # use_local_model: bool = True
-    # bedrock_model_id: str = ""
-    # bedrock_region: str = ""
-    # bedrock_role_arn: str = ""
-    # embeddings_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    # vector_index_path: str = "./vectorstore"
+    use_bedrock: bool = False
+    use_local_model: bool = True
+    bedrock_model_id: str = ""
+    bedrock_region: str = ""
+    bedrock_role_arn: str = ""
+    embeddings_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    vector_index_path: str = "./vectorstore"
 
     # ─────────────── Computed Properties ───────────────
     @property

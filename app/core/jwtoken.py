@@ -1,7 +1,6 @@
 import jwt 
 from typing import Union
 from datetime import datetime, timedelta, UTC
-
 from app.core.settings import load_settings
 
 settings = load_settings()

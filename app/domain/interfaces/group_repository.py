@@ -1,0 +1,8 @@
+from abc import abstractmethod
+from app.models.models import Group
+
+
+class IGroupRepository:
+    @abstractmethod
+    def delete_group(self, name: str) -> object:
+        pass
