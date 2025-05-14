@@ -1,3 +1,4 @@
+from app.helpers.exceptions.exceptions import NotFoundException
 from app.models.models import Group
 
 
@@ -15,3 +16,13 @@ class GroupRepositoryPostgres:
     
         self.db.commit()
         return {"message": f"Grupo deletado com sucesso."}
+    
+    def create_group(self, group = Group) -> Group:
+        existing_group = self.db.query(Group).filter(Group.name == group.name).first()
+        if existing_group:
+            raise NotFoundException("Já existe um grupo com esse nome.")
+        
+        self.db.add(group)
+        self.db.commit()
+        self.db.refresh(group)
+        return group
