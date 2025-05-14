@@ -23,6 +23,7 @@ class User(Base):
     groups = relationship("Group", back_populates="user")
     sessions = relationship("Session", back_populates="user")
     class_topics = relationship("ClassTopic", back_populates="user")
+    enrollments = relationship("GroupEnrollment", back_populates="user", cascade="all, delete-orphan")
 
 
 # ──────────────── Group ────────────────
@@ -33,11 +34,23 @@ class Group(Base):
     name = Column(String, nullable=False)
     year_semester = Column(Integer, nullable=False)
     status = Column(Boolean, default=True)
-    user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
+    manager_id = Column(String, ForeignKey("users.user_id"), nullable=False)
 
     user = relationship("User", back_populates="groups")
     classes = relationship("ClassModel", back_populates="group", cascade="all, delete-orphan")
     sessions = relationship("Session", back_populates="group", cascade="all, delete-orphan")
+    enrollments = relationship("GroupEnrollment", back_populates="group", cascade="all, delete-orphan")
+
+
+# ──────────────── GroupEnrollment ────────────────
+class GroupEnrollment(Base):
+    __tablename__ = "group_enrollments"
+
+    group_id = Column(String, ForeignKey("groups.group_id"), primary_key=True)
+    student_id = Column(String, ForeignKey("users.user_id"), primary_key=True)
+
+    group = relationship("Group", back_populates="enrollments")
+    user = relationship("User", back_populates="enrollments")
 
 
 # ──────────────── Class (renomeado para evitar conflito com palavra reservada) ────────────────
@@ -67,6 +80,7 @@ class ClassTopic(Base):
     flag = Column(Boolean, default=False)
     class_id = Column(String, ForeignKey("classes.class_id"), nullable=False)
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
+
     class_ = relationship("ClassModel", back_populates="class_topics")
     user = relationship("User", back_populates="class_topics")
 
