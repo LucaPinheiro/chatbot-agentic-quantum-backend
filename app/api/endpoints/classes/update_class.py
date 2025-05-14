@@ -24,15 +24,19 @@ class UseCase:
         self.classes_repo = self.repository.classes_repo
 
     def execute(self, schema: UpdateClassRequest) -> List[UpdateClassResponse]:
-        classes = self.classes_repo.update_class()
+        class_updated = self.classes_repo.update_class(class_id=schema.class_id, 
+                                                       group_id=schema.group_id, 
+                                                       title=schema.title, 
+                                                       pdf_url=schema.pdf_url, 
+                                                       status=schema.status, order=schema.order)
         return UpdateClassResponse(
-                group_id=classes.group_id,
-                title=classes.title,
-                pdf_url=classes.pdf_url,
-                status=classes.status,
-                last_access_class=classes.last_access_class,
-                created_at=classes.created_at,
-                order=classes.order
+                group_id= class_updated.group_id,
+                title= class_updated.title,
+                pdf_url= class_updated.pdf_url,
+                status= class_updated.status,
+                last_access_class= class_updated.last_access_class,
+                created_at= class_updated.created_at,
+                order= class_updated.order
             )
     
 class Controller:
@@ -49,8 +53,9 @@ class Controller:
         
 @router.put("/classes/update", response_model=List[UpdateClassResponse])
 async def update_class(
+    class_id: str,
     token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
-    return controller.handle(UpdateClassRequest())
+    return controller.handle(UpdateClassRequest(class_id=class_id))
