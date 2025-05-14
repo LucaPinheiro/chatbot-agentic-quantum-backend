@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Optional, Union
 from app.domain.interfaces.classes_repository import IClassesRepository
 from app.models.models import ClassModel
 from sqlalchemy.orm import Session
@@ -55,13 +55,22 @@ class ClassesRepositoryPostgres(IClassesRepository):
             for cls in classes
         ]
 
-    def update_class(self, class_id: str) -> Union[UpdateClassResponse, dict]:
+    def update_class(self, class_id: str, group_id: Optional[str], title: Optional[str], 
+                     pdf_url: Optional[str], status: Optional[bool], order: Optional[int]) -> Union[UpdateClassResponse, dict]:
         class_ = self.db.query(ClassModel).filter(ClassModel.class_id == class_id).first()
-        if not class_:
-            return {"message": "Aula não encontrada."}
-    
-        class_.status = True
+        if status:
+            class_.status = status
+        if group_id:
+            class_.group_id = group_id 
+        if title:       
+            class_.title = title
+        if pdf_url:
+            class_.pdf_url = pdf_url
+        if order:   
+            class_.order = order
+            
         self.db.commit()
+        self.db.refresh(class_) 
         return UpdateClassResponse(
             group_id=class_.group_id,
             title=class_.title,
