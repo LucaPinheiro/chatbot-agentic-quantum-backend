@@ -4,19 +4,16 @@ from pydantic import BaseModel
 
 
 class UpdateClassRequest(BaseModel):
-    class_id: str
-    group_id: Optional[str]
-    title: Optional[str]
-    pdf_url: Optional[str]
-    status: Optional[bool]
-    order: Optional[int]
+    group_id: Optional[str] = None
+    title: Optional[str] = None
+    pdf_url: Optional[str] = None
+    status: Optional[bool] = None
+    order: Optional[int] = None
 
 
 class UpdateClassResponse(BaseModel):
     group_id: str
     title: str
     pdf_url: str
-    status: str
-    last_access_class: datetime
-    created_at: datetime
+    status: bool
     order: int
