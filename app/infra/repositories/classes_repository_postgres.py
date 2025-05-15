@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from app.domain.interfaces.classes_repository import IClassesRepository
+from app.helpers.exceptions.exceptions import NotFoundException
 from app.models.models import ClassModel
 from sqlalchemy.orm import Session
 
@@ -58,17 +59,19 @@ class ClassesRepositoryPostgres(IClassesRepository):
     def update_class(self, class_id: str, group_id: Optional[str], title: Optional[str], 
                      pdf_url: Optional[str], status: Optional[bool], order: Optional[int]) -> Union[UpdateClassResponse, dict]:
         class_ = self.db.query(ClassModel).filter(ClassModel.class_id == class_id).first()
-        if status:
-            class_.status = status
+        if not class_:
+             raise NotFoundException("Aula não encontrada.")
         if group_id:
             class_.group_id = group_id 
         if title:       
             class_.title = title
         if pdf_url:
             class_.pdf_url = pdf_url
-        if order:   
+        if status is not None:
+            class_.status = status
+        if order is not None:   
             class_.order = order
-            
+
         self.db.commit()
         self.db.refresh(class_) 
         return UpdateClassResponse(
@@ -76,8 +79,6 @@ class ClassesRepositoryPostgres(IClassesRepository):
             title=class_.title,
             pdf_url=class_.pdf_url,
             status=class_.status,
-            last_access_class=class_.last_access_class,
-            created_at=class_.created_at,
             order=class_.order
         )
 
