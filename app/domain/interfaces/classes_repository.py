@@ -15,5 +15,12 @@ class IClassesRepository:
     @abstractmethod
     def get_all_classes(self) -> List[ClassModel]:
         pass
-    def update_class(self, class_id: str) -> Union[UpdateClassResponse, dict]:
+    @abstractmethod
+    def update_class(self,
+                     class_id: str,
+                     group_id: Optional[str],
+                     title: Optional[str],
+                     pdf_url: Optional[str],
+                     status: Optional[bool],
+                     order: Optional[int]) -> Union[UpdateClassResponse, dict]:
         pass
