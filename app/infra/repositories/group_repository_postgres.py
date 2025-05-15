@@ -56,3 +56,13 @@ class GroupRepositoryPostgres:
             status=group.status,
             user_id=group.user_id
         )
+
+    def is_manager_group(self, group_id: str, user_id: str) -> bool:
+        """
+        Verifica se o usuário (professor ou admin) é o gerente do grupo
+        """
+        exists = self.db.query(Group).filter(
+            Group.id == group_id,
+            Group.user_id == user_id
+        ).first()
+        return exists is not None
