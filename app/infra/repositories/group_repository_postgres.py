@@ -46,7 +46,7 @@ class GroupRepositoryPostgres:
         if status is not None:
             group.status = status
         if user_id:
-            group.user_id = user_id
+            group.manager_id = user_id
         
         self.db.commit()
         self.db.refresh(group)
