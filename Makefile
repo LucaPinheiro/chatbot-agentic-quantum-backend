@@ -44,3 +44,31 @@ rebuild:
 
 clean:
 	docker system prune -af && docker volume prune -f
+
+## ────────────────────────────── Reset Total ─────────────────────────────── ##
+
+reset-all:
+	echo "🧨 Parando containers..."
+	make down || true
+
+	echo "🧼 Removendo todos os containers..."
+	docker rm -f $$(docker ps -aq) || true
+
+	echo "🧹 Limpando volumes e imagens..."
+	docker volume prune -f
+	docker image prune -a -f
+
+	echo "🗑 Removendo volume específico do Postgres..."
+	docker volume rm $(PROJECT_NAME)_postgres_data || true
+
+	echo "🔧 Rebuild completo dos containers..."
+	make rebuild
+
+	echo "🚀 Subindo containers..."
+	make up
+
+	echo "🧱 Inicializando banco de dados..."
+	sleep 5  # tempo para o postgres iniciar
+	make init-db
+
+	echo "✅ Reset completo!"

@@ -1,7 +1,11 @@
-from typing import List
+from typing import List, Optional, Union
 from app.domain.interfaces.classes_repository import IClassesRepository
+from app.helpers.exceptions.exceptions import NotFoundException
 from app.models.models import ClassModel
 from sqlalchemy.orm import Session
+
+from app.schemas.get_all_classes import GetAllClassesResponse
+from app.schemas.update_class import UpdateClassResponse
 
 
 class ClassesRepositoryPostgres(IClassesRepository):
@@ -16,3 +20,65 @@ class ClassesRepositoryPostgres(IClassesRepository):
         print(f"[DEBUG] Resultado da query: {classes}")
         print(type(group_id))
         return classes
+
+    def delete_class(self, group_id: str, title: str):
+        group_exists = self.db.query(ClassModel).filter(ClassModel.group_id == group_id).first()
+        if not group_exists:
+            return {"message": "Grupo não encontrado."}
+    
+        classes = self.db.query(ClassModel).filter(
+            ClassModel.group_id == group_id,
+            ClassModel.title == title
+        ).all()
+
+        if not classes:
+            return {"message": "Nenhuma aula encontrada com esse nome."}
+    
+        for class_ in classes:
+            self.db.delete(class_)
+
+        self.db.commit()
+        return {"message": "Aula deletada com sucesso."}
+    
+    def get_all_classes(self) -> List[GetAllClassesResponse]:
+        classes = self.db.query(ClassModel).all()
+        return [
+            GetAllClassesResponse(
+                class_id=cls.class_id,
+                group_id=cls.group_id,
+                title=cls.title,
+                pdf_url=cls.pdf_url,
+                status=cls.status,
+                last_access_class=cls.last_access_class,
+                created_at=cls.created_at,
+                order=cls.order
+            )
+            for cls in classes
+        ]
+
+    def update_class(self, class_id: str, group_id: Optional[str], title: Optional[str], 
+                     pdf_url: Optional[str], status: Optional[bool], order: Optional[int]) -> Union[UpdateClassResponse, dict]:
+        class_ = self.db.query(ClassModel).filter(ClassModel.class_id == class_id).first()
+        if not class_:
+             raise NotFoundException("Aula não encontrada.")
+        if group_id:
+            class_.group_id = group_id 
+        if title:       
+            class_.title = title
+        if pdf_url:
+            class_.pdf_url = pdf_url
+        if status is not None:
+            class_.status = status
+        if order is not None:   
+            class_.order = order
+
+        self.db.commit()
+        self.db.refresh(class_) 
+        return UpdateClassResponse(
+            group_id=class_.group_id,
+            title=class_.title,
+            pdf_url=class_.pdf_url,
+            status=class_.status,
+            order=class_.order
+        )
+

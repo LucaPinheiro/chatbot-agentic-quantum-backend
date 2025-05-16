@@ -8,7 +8,7 @@ class Group(BaseModel):
     name: str
     year_semester: int
     status: bool
-    user_id: str
+    manager_id: str
     @classmethod
     def from_orm(cls, group: Type[Group]) -> Self:
         return cls(
@@ -16,7 +16,7 @@ class Group(BaseModel):
             name=group.name,
             year_semester=group.year_semester,
             status=group.status,
-            user_id=group.user_id
+            manager_id=group.manager_id
         )
     
     def to_orm(self) -> Group:
@@ -25,7 +25,7 @@ class Group(BaseModel):
             name=self.name,
             year_semester=self.year_semester,
             status=self.status,
-            user_id=self.user_id
+            manager_id=self.manager_id
         )
     
     def to_dict(self, exclude=None) -> dict:
@@ -37,7 +37,7 @@ class Group(BaseModel):
                 "name": self.name,
                 "year_semester": self.year_semester,
                 "status": self.status,
-                "user_id": self.user_id
+                "manager_id": self.manager_id
             }
             
             for key in exclude:
