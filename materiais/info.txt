@@ -1,0 +1,9 @@
+make down
+make rebuild
+make up
+
+make shell  # entra no container
+make init-db  # reinicializa DB
+make reset-db  # derruba e sobe o banco zerado
+
+docker logs docker-app-1  
