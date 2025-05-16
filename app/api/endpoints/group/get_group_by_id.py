@@ -35,7 +35,7 @@ class UseCase:
             name=group.name,
             year_semester=group.year_semester,
             status=group.status,
-            user_id=group.user_id
+            manager_id=group.manager_id
         )
 
 
