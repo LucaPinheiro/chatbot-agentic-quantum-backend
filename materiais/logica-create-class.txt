@@ -1,0 +1,60 @@
+    
+    ------------------------------------------------------------------------------------
+rotas:
+    1. create_class
+    2. add_topic_to_class
+    3. delete_topic_by_id
+    4. delete_class_by_id (precisa deletar todos os topicos que a aula tem)
+  
+ajuste:
+    5. delete_group_by_id (ao deletar um grupo, precisa deletar todas as classes (aulas) e todos os topicos de todas as aulas)
+
+    ------------------------------------------------------------------------------------
+  1. execute(schema)
+
+  schema -> CLASS + CT
+
+  AULA DE INTRODUCAO A QUANTICA
+  TOPICOS: 1. OQUE É QUANTICA. 
+           2. QUANTICA USANDO PYTHON 
+           3. VETORES NO PY 
+
+
+  BODY CREATE CLASS: 
+  schema: {
+    "group_id": "abc123",
+    "title": "INTRODUCAO A QUANTICA",
+    "order": "1",
+    "class_topics": [
+      {
+        "topic": "OQUE É QUANTICA?",
+        "topic_pdf_url": "www.aws_s3.com.br/quant",
+        "class_id": "5678"
+      },
+      {
+        "topic": "QUANTICA USANDO PYTHON?",
+        "topic_pdf_url": "www.aws_s3.com.br/py",
+        "class_id": "5678"
+      }, 
+      {
+        "topic": "VETORES NO PY",
+        "topic_pdf_url": "www.aws_s3.com.br/vet",
+        "class_id": "5678"
+      }
+    ]
+  }
+
+class_id = hex.uuidv4()
+created_class = Class(class_id, schema.group_id, schema.title, schema.order)
+saved_class = self.repo.classes_repo.create_class(created_class)
+
+for ct in schema.class_topics:
+  created_class_topic = None
+
+  class_topics_id = hex.uuidv4()
+  
+  created_class_topic = ClassTopic(class_topics_id, ct.topic, ct.topic_pdf_url, class_id)
+  saved_class_topics = self.repo.class_topics.create_topic(created_class_topic)
+
+
+
