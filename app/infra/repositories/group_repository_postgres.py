@@ -62,7 +62,7 @@ class GroupRepositoryPostgres:
         Verifica se o usuário (professor ou admin) é o gerente do grupo
         """
         exists = self.db.query(Group).filter(
-            Group.id == group_id,
-            Group.user_id == user_id
+            Group.group_id == group_id,
+            Group.manager_id == user_id
         ).first()
         return exists is not None
