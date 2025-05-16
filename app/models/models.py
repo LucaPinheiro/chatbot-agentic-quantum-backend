@@ -77,12 +77,21 @@ class ClassTopic(Base):
 
     class_topics_id = Column(String, primary_key=True)
     topic = Column(String, nullable=False)
-    flag = Column(Boolean, default=False)
     class_id = Column(String, ForeignKey("classes.class_id"), nullable=False)
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
 
     class_ = relationship("ClassModel", back_populates="class_topics")
     user = relationship("User", back_populates="class_topics")
+    
+    
+# ──────────────── TopicProgress ────────────────
+class TopicProgress(Base):
+    __tablename__ = "topic_progress"
+    
+    topic_progress_id = Column(String, primary_key=True)
+    class_topics_id = Column(String, ForeignKey("class_topics.class_topics_id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
+    flag = Column(Boolean, default=False)
 
 
 # ──────────────── Session ────────────────
