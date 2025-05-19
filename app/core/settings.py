@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     # ─────────────── AWS / DynamoDB ───────────────
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
-    aws_region: str = "sa-east-1"
+    aws_region: str = "us-east-1"
     aws_s3_bucket: str = "qt-chatbot"
     dynamodb_region: str = "sa-east-1"
     dynamodb_table_messages: str = ""
