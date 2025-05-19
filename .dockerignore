@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.pt
+*.pkl
+*.log
+.env
+.git/
+tests/
+notebooks/
+media/
+data/
+tmp/
