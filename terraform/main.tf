@@ -170,3 +170,4 @@ resource "aws_apprunner_service" "fastapi_service" {
 
   depends_on = [aws_iam_role_policy_attachment.ecr_read_policy]
 }
+
