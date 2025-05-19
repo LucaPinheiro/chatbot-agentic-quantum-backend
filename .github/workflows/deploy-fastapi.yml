@@ -1,0 +1,51 @@
+name: Build & Push FastAPI to ECR
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "app/**"
+      - "docker/**"
+      - "Dockerfile.prod"
+      - ".github/workflows/deploy-fastapi.yml"
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: fastapi-app
+  IMAGE_TAG: latest
+
+jobs:
+  push-to-ecr:
+    name: Build & Push Docker Image to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🐳 Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: 🔨 Build Docker Image
+        run: |
+          docker build -f docker/Dockerfile.prod -t $ECR_REPOSITORY:$IMAGE_TAG .
+
+      - name: 🏷 Tag Docker Image
+        run: |
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $IMAGE_URI
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
+      - name: 📤 Push Docker Image to ECR
+        run: |
+          docker push $IMAGE_URI
+
+      - name: 🚀 Trigger App Runner Deployment (optional)
+        run: |
+          echo "⚙️ Forçando App Runner a atualizar com a nova imagem"
+          aws apprunner start-deployment --service-arn arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/<HASH> \
+            --region $AWS_REGION
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
