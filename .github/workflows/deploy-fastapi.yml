@@ -13,6 +13,7 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: fastapi-app
   IMAGE_TAG: latest
+  APP_RUNNER_ARN: arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/ef0145a0a455420e92974c3657943fac
 
 jobs:
   build-and-deploy:
@@ -57,5 +58,5 @@ jobs:
         run: |
           echo "⚙️ Forcing App Runner redeploy with latest image"
           aws apprunner start-deployment \
-            --service-arn arn:aws:apprunner:${{ env.AWS_REGION }}:790856957430:service/fastapi-app-service/<HASH> \
+            --service-arn $APP_RUNNER_ARN \
             --region $AWS_REGION
