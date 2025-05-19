@@ -17,7 +17,7 @@ env:
 
 jobs:
   build-deploy-infra:
-    name: Create ECR and Deploy App Runner
+    name: ✨ Create ECR and App Runner Service
     runs-on: ubuntu-latest
 
     steps:
@@ -40,13 +40,14 @@ jobs:
         working-directory: terraform
         run: terraform init
 
-      - name: ✅ Terraform Apply (ECR + App Runner)
+      - name: ✅ Terraform Apply (Infra)
         working-directory: terraform
-        run: |
-          terraform apply -auto-approve -var="region=${{ env.AWS_REGION }}"
+        env:
+          TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        run: terraform apply -auto-approve -var="region=${{ env.AWS_REGION }}"
 
   build-push-ecr:
-    name: Build & Push Docker Image to ECR
+    name: 🛠️ Build & Push Docker Image
     runs-on: ubuntu-latest
     needs: build-deploy-infra
 
@@ -81,11 +82,10 @@ jobs:
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
       - name: 📤 Push Docker Image to ECR
-        run: |
-          docker push $IMAGE_URI
+        run: docker push $IMAGE_URI
 
   trigger-app-runner:
-    name: Trigger App Runner Deployment
+    name: 🎉 Trigger App Runner Deployment
     runs-on: ubuntu-latest
     needs: build-push-ecr
 
@@ -97,11 +97,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: ✨ Start Deployment on App Runner
+      - name: 💨 Start App Runner Deployment
         run: |
           SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='fastapi-app-service'].ServiceArn" --output text)
           if [ -z "$SERVICE_ARN" ]; then
-            echo "App Runner service not found. Aborting."
+            echo "❌ App Runner service not found. Aborting."
             exit 1
           fi
-          aws apprunner start-deployment --service-arn $SERVICE_ARN --region $AWS_REGION
+          echo "✅ Starting deployment for: $SERVICE_ARN"
+          aws apprunner start-deployment --service-arn "$SERVICE_ARN" --region $AWS_REGION
