@@ -1,8 +1,8 @@
-name: Build & Push FastAPI to ECR
+name: Build & Deploy FastAPI to App Runner via ECR
 
 on:
   push:
-    branches: [dev]
+    branches: [adjusting-dev]
     paths:
       - "app/**"
       - "docker/**"
@@ -15,21 +15,33 @@ env:
   IMAGE_TAG: latest
 
 jobs:
-  push-to-ecr:
-    name: Build & Push Docker Image to ECR
+  build-and-deploy:
+    name: Build, Push to ECR & Deploy to App Runner
     runs-on: ubuntu-latest
 
     steps:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v3
 
+      - name: 💡 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: 🐳 Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: 🔨 Build Docker Image
+      - name: 🔨 Build Docker Image (linux/amd64)
         run: |
-          docker build -f docker/Dockerfile.prod -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker buildx create --use --name multiarch-builder || true
+          docker buildx inspect multiarch-builder --bootstrap
+          docker buildx build --platform linux/amd64 \
+            -f docker/Dockerfile.prod \
+            -t $ECR_REPOSITORY:$IMAGE_TAG \
+            --load .
 
       - name: 🏷 Tag Docker Image
         run: |
@@ -41,11 +53,9 @@ jobs:
         run: |
           docker push $IMAGE_URI
 
-      - name: 🚀 Trigger App Runner Deployment (optional)
+      - name: 🚀 Trigger App Runner Deployment
         run: |
-          echo "⚙️ Forçando App Runner a atualizar com a nova imagem"
-          aws apprunner start-deployment --service-arn arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/<HASH> \
+          echo "⚙️ Forcing App Runner redeploy with latest image"
+          aws apprunner start-deployment \
+            --service-arn arn:aws:apprunner:${{ env.AWS_REGION }}:790856957430:service/fastapi-app-service/<HASH> \
             --region $AWS_REGION
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
