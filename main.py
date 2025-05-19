@@ -96,7 +96,6 @@ def create_app() -> FastAPI:
     logger.info("✅ FastAPI app criado com sucesso.")
     return app
 
-
 app = create_app()
 
 if __name__ == "__main__":
