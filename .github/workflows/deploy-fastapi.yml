@@ -54,9 +54,9 @@ jobs:
         run: |
           docker push $IMAGE_URI
 
-      - name: 🚀 Trigger App Runner Deployment
-        run: |
-          echo "⚙️ Forcing App Runner redeploy with latest image"
-          aws apprunner start-deployment \
-            --service-arn $APP_RUNNER_ARN \
-            --region $AWS_REGION
+      # - name: 🚀 Trigger App Runner Deployment
+      #   run: |
+      #     echo "⚙️ Forcing App Runner redeploy with latest image"
+      #     aws apprunner start-deployment \
+      #       --service-arn $APP_RUNNER_ARN \
+      #       --region $AWS_REGION
