@@ -13,7 +13,7 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: fastapi-app
   IMAGE_TAG: latest
-  APP_RUNNER_ARN: arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/ef0145a0a455420e92974c3657943fac
+  APP_RUNNER_ARN: arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/843b9e160f7e4a47b51d53826d60bf75
 
 jobs:
   build-and-deploy:
@@ -54,9 +54,9 @@ jobs:
         run: |
           docker push $IMAGE_URI
 
-      # - name: 🚀 Trigger App Runner Deployment
-      #   run: |
-      #     echo "⚙️ Forcing App Runner redeploy with latest image"
-      #     aws apprunner start-deployment \
-      #       --service-arn $APP_RUNNER_ARN \
-      #       --region $AWS_REGION
+      - name: 🚀 Trigger App Runner Deployment
+        run: |
+          echo "⚙️ Forcing App Runner redeploy with latest image"
+          aws apprunner start-deployment \
+            --service-arn $APP_RUNNER_ARN \
+            --region $AWS_REGION
