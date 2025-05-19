@@ -157,6 +157,12 @@ resource "aws_apprunner_service" "fastapi_service" {
     auto_deployments_enabled = true
   }
 
+  health_check_configuration {
+    protocol = "TCP"
+    path     = "/docs"
+  }
+
+
   instance_configuration {
     cpu    = "512"
     memory = "1024"
