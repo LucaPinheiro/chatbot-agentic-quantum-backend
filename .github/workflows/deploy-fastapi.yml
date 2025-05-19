@@ -8,17 +8,47 @@ on:
       - "docker/**"
       - "Dockerfile.prod"
       - ".github/workflows/deploy-fastapi.yml"
+      - "terraform/**"
 
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: fastapi-app
   IMAGE_TAG: latest
-  APP_RUNNER_ARN: arn:aws:apprunner:us-east-1:790856957430:service/fastapi-app-service/843b9e160f7e4a47b51d53826d60bf75
 
 jobs:
-  build-and-deploy:
-    name: Build, Push to ECR & Deploy to App Runner
+  build-deploy-infra:
+    name: Create ECR and Deploy App Runner
     runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 💡 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: 📖 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: 🪑 Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: ✅ Terraform Apply (ECR + App Runner)
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve -var="region=${{ env.AWS_REGION }}"
+
+  build-push-ecr:
+    name: Build & Push Docker Image to ECR
+    runs-on: ubuntu-latest
+    needs: build-deploy-infra
 
     steps:
       - name: ⬇️ Checkout Repository
@@ -54,9 +84,24 @@ jobs:
         run: |
           docker push $IMAGE_URI
 
-      - name: 🚀 Trigger App Runner Deployment
+  trigger-app-runner:
+    name: Trigger App Runner Deployment
+    runs-on: ubuntu-latest
+    needs: build-push-ecr
+
+    steps:
+      - name: 💡 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ✨ Start Deployment on App Runner
         run: |
-          echo "⚙️ Forcing App Runner redeploy with latest image"
-          aws apprunner start-deployment \
-            --service-arn $APP_RUNNER_ARN \
-            --region $AWS_REGION
+          SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='fastapi-app-service'].ServiceArn" --output text)
+          if [ -z "$SERVICE_ARN" ]; then
+            echo "App Runner service not found. Aborting."
+            exit 1
+          fi
+          aws apprunner start-deployment --service-arn $SERVICE_ARN --region $AWS_REGION
