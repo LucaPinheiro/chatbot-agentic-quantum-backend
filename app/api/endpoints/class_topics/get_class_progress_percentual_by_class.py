@@ -20,7 +20,7 @@ class UseCase:
 
     def execute(self, schema: GetClassProgressPercentualByClassRequest, token_user: TokenUser) -> GetClassProgressPercentualByClassResponse:
         user_id = token_user.id
-        progress_data = self.class_topics_repo.get_class_progress_percentual_by_class(class_id=schema.class_id, user_id=user_id)
+        progress_data = self.class_topics_repo.get_class_progress_percentual_by_class(class_id=schema.class_id, user_id=user_id, class_topics_id=schema.class_topics_id)
     
         return GetClassProgressPercentualByClassResponse(
             class_id=progress_data["class_id"],
@@ -48,8 +48,15 @@ class Controller:
 @router.get("/class_progress", response_model=GetClassProgressPercentualByClassResponse)
 async def get_class_progress_percentual_by_class(
     class_id: str,
+    class_topics_id: str,
     token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR | PermissionLevelEnum.STUDENT))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
-    return controller.handle(GetClassProgressPercentualByClassRequest(class_id=class_id), token_user)
+    return controller.handle(
+        GetClassProgressPercentualByClassRequest(
+            class_id=class_id,
+            class_topics_id=class_topics_id
+        ),
+        token_user
+    )
