@@ -53,8 +53,11 @@ jobs:
 
       - name: ✅ Terraform Apply (ECR + App Runner)
         working-directory: terraform
+        env:
+          TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          terraform apply -auto-approve -var="region=${{ env.AWS_REGION }}"
+          terraform apply -auto-approve \
+            -var="region=${{ env.AWS_REGION }}"
 
   build-push-ecr:
     name: Build & Push Docker Image to ECR
@@ -110,10 +113,16 @@ jobs:
 
       - name: ✨ Start Deployment on App Runner
         run: |
-          SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='fastapi-app-service'].ServiceArn" --output text)
+          SERVICE_ARN=$(aws apprunner list-services \
+            --query "ServiceSummaryList[?ServiceName=='fastapi-app-service'].ServiceArn" \
+            --output text)
+
           if [ -z "$SERVICE_ARN" ]; then
             echo "❌ App Runner service not found. Aborting."
             exit 1
           fi
+
           echo "✅ Redeploying $SERVICE_ARN..."
-          aws apprunner start-deployment --service-arn $SERVICE_ARN --region $AWS_REGION
+          aws apprunner start-deployment \
+            --service-arn $SERVICE_ARN \
+            --region $AWS_REGION
