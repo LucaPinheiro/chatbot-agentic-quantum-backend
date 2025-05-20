@@ -31,10 +31,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 📖 Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.7
+      - name: 🧹 Delete ECR Repo if exists
+        run: |
+          echo "🔍 Verificando existência do repositório $ECR_REPOSITORY..."
+          if aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_REGION > /dev/null 2>&1; then
+            echo "🗑️ Repositório encontrado. Deletando com --force..."
+            aws ecr delete-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION --force
+          else
+            echo "✅ Repositório não existe. Continuando..."
+          fi
 
       - name: 🧹 Delete IAM Role if exists (AppRunner)
         run: |
@@ -47,6 +52,11 @@ jobs:
           echo "🗑️ Deletando a role (se existir)"
           aws iam delete-role --role-name $ROLE_NAME || echo "✅ Role já removida ou não existente"
 
+      - name: 📖 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
       - name: 🪑 Terraform Init
         working-directory: terraform
         run: terraform init
@@ -56,8 +66,7 @@ jobs:
         env:
           TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          terraform apply -auto-approve \
-            -var="region=${{ env.AWS_REGION }}"
+          terraform apply -auto-approve -var="region=${{ env.AWS_REGION }}"
 
   build-push-ecr:
     name: Build & Push Docker Image to ECR
