@@ -22,7 +22,7 @@ class DynamoRepositoryError(RuntimeError):
 @dataclass(frozen=True, slots=True)
 class DynamoConfig:
     table_name: str
-    region_name: str = settings.aws_region
+    region_name: str = settings.dynamodb_region
     endpoint_url: Optional[str] = None
     partition_key: str = "PK"
     sort_key: str = "SK"
@@ -73,6 +73,7 @@ class DynamoDBResources:
 
             self._table.put_item(Item=self._decimalise(item_copy))
         except ClientError as exc:
+            print(f"Error putting item: {exc}")
             raise DynamoRepositoryError(exc) from exc
 
     def get(self, partition_key: str, sort_key: Optional[str] = None) -> Optional[Dict[str, Any]]:

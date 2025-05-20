@@ -116,4 +116,3 @@ jobs:
             -var="region=sa-east-1" \
             -var="dynamo_table_name=session-chatbot" \
             -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}"
-            

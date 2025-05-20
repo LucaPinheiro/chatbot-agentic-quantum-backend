@@ -33,6 +33,7 @@ class UseCase:
 
     def execute(self, session_id: str, schema: CreateChatMessageRequest) -> CreateChatMessageResponse:
         session = self.session_repo.get_session_by_id(session_id)
+        print(f"🔍 Sessão encontrada: {session}")
         if not session:
             raise NotFoundException("Sessão não encontrada.")
 
@@ -48,6 +49,7 @@ class UseCase:
             role="user",
             type="message"
         )
+        print("💬 Mensagem do usuário recebida:", schema.message)
         self.chat_repo.save_message(user_msg)
         print(f"📝 Mensagem do usuário salva com sucesso: \"{schema.message}\"")
 
