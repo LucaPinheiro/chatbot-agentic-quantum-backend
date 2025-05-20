@@ -1,9 +1,7 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
+from typing import Dict
 
-from app.models.models import ClassTopic
-
-
-class IClassTopicsRepository:
+class IClassTopicsRepository(ABC):
     @abstractmethod
-    def get_class_progress_percentual_by_class(self, class_id: str, user_id: str) -> ClassTopic:
+    def get_class_progress_percentual_by_class(self, class_id: str, user_id: str, class_topics_id: str) -> Dict:
         pass
