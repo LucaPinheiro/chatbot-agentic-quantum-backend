@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
-from app.models.models import User as UserModel
+from app.models.models import TopicProgress, User as UserModel
 from app.helpers.exceptions.exceptions import NotFoundException
 
 
@@ -33,3 +33,14 @@ class UserRepositoryPostgres(IUserRepository):
     def get_all_users(self) -> List[User]:
         users = self.db.query(UserModel).all()
         return [User.from_orm(user) for user in users]
+    
+    def delete_user(self, user_id: str, name: str):
+        user = self.db.query(UserModel).filter(UserModel.user_id == user_id, UserModel.name == name).first()
+        if not user:
+            raise NotFoundException("User not found")
+
+        self.db.delete(user)
+        self.db.commit()
+
+        return {"message": "User deleted successfully"}
+
