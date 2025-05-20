@@ -24,3 +24,13 @@ class IClassesRepository:
                      status: Optional[bool],
                      order: Optional[int]) -> Union[UpdateClassResponse, dict]:
         pass
+    @abstractmethod
+    def create_class(
+        self,
+        group_id: str,
+        title: str,
+        pdf_url: str,
+        topics: List[str],
+        user_id: str
+    ) -> ClassModel:
+        pass

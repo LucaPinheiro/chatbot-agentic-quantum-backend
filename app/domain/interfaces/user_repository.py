@@ -20,3 +20,7 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_all_users(self) -> List[User]:
         pass
+    
+    @abstractmethod
+    def delete_user(self, user_id: str, name: str):
+        pass

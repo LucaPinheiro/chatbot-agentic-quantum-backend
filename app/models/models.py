@@ -20,10 +20,12 @@ class User(Base):
     permission = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
 
-    groups = relationship("Group", back_populates="user")
-    sessions = relationship("Session", back_populates="user")
-    class_topics = relationship("ClassTopic", back_populates="user")
+    groups = relationship("Group", back_populates="manager",passive_deletes=True)
+    sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
+    class_topics = relationship("ClassTopic", back_populates="user", cascade="all, delete-orphan")
     enrollments = relationship("GroupEnrollment", back_populates="user", cascade="all, delete-orphan")
+    topic_progress = relationship("TopicProgress",back_populates="user", cascade="all, delete-orphan")
+
 
 
 # ──────────────── Group ────────────────
@@ -34,9 +36,9 @@ class Group(Base):
     name = Column(String, nullable=False)
     year_semester = Column(Integer, nullable=False)
     status = Column(Boolean, default=True)
-    manager_id = Column(String, ForeignKey("users.user_id"), nullable=False)
+    manager_id = Column(String, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
 
-    user = relationship("User", back_populates="groups")
+    manager = relationship("User", back_populates="groups")
     classes = relationship("ClassModel", back_populates="group", cascade="all, delete-orphan")
     sessions = relationship("Session", back_populates="group", cascade="all, delete-orphan")
     enrollments = relationship("GroupEnrollment", back_populates="group", cascade="all, delete-orphan")
@@ -92,6 +94,8 @@ class TopicProgress(Base):
     class_topics_id = Column(String, ForeignKey("class_topics.class_topics_id"), nullable=False)
     user_id = Column(String, ForeignKey("users.user_id"), nullable=False)
     flag = Column(Boolean, default=False)
+    
+    user = relationship("User", back_populates="topic_progress")
 
 
 # ──────────────── Session ────────────────
