@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class GetClassProgressPercentualByClassRequest(BaseModel):
     class_id: str
+    class_topics_id: str
    
 class GetClassProgressPercentualByClassResponse(BaseModel):
     class_id: str
