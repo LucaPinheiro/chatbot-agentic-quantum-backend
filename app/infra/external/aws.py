@@ -159,14 +159,21 @@ class SQSResources:
     def __init__(self, region_name: str = settings.aws_region):
         self.sqs = boto3.client("sqs", region_name=region_name)
 
-    def send_message(self, sqs_message: SQSMessage) -> bool:
+    def send_message(self, sqs_message: SQSMessage, queue: str = "summarizer") -> bool:
+        if queue == "summarizer":
+            queue = settings.sqs_summarizer_queue_url
+        elif queue == "analyzer":
+            queue = settings.sqs_analyzer_queue_url
+        else:
+            raise ValueError("Invalid queue name. Use summarizer or analyzer.")
+        
         try:
             if settings.stage == StageEnum.test:
                 print("[TEST MODE] SQS message not sent.")
                 return True
 
             response = self.sqs.send_message(
-                QueueUrl=settings.sqs_queue_url,
+                QueueUrl=queue,
                 MessageGroupId=sqs_message.message_group_id,
                 MessageBody=sqs_message.to_json()
             )

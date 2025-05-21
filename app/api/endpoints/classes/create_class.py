@@ -1,20 +1,10 @@
-import datetime
-import uuid
-
 from fastapi import APIRouter, HTTPException, Security
 from app.core.permissions import RequirePermission
-from app.domain.entities.classes import ClassModel
-from app.domain.entities.user import User
 from app.domain.interfaces.classes_repository import IClassesRepository
-from app.domain.interfaces.group_repository import IGroupRepository
 from app.domain.interfaces.user_repository import IUserRepository
 from app.helpers.enums.enums import PermissionLevelEnum
-from app.helpers.utils.encrypt import Encrypt
 from app.infra.repository import Repository
-from app.models.models import Group
 from app.schemas.create_class import CreateClassRequest, CreateClassResponse
-from app.schemas.create_group import CreateGroupRequest, CreateGroupResponse
-from app.schemas.create_user import CreateUserRequest, CreateUserResponse
 from app.helpers.exceptions.exceptions import DatabaseException, UnauthorizedException, DuplicatedException
 from app.schemas.token import TokenUser
 

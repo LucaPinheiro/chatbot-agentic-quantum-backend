@@ -38,3 +38,21 @@ class ClassTopicsRepositoryPostgres:
             "total": total,
             "done": done,
         }
+        
+    def get_all_topics_by_class(self, class_id: str):
+        class_topics = self.db.query(
+            ClassTopic.class_topics_id,
+            ClassTopic.topic
+        ).filter(
+            ClassTopic.class_id == class_id
+        ).all()
+        
+        if not class_topics:
+            return None
+        
+        return [
+            {"class_topics_id": ct[0], "topic": ct[1]}
+            for ct in class_topics
+        ]
+
+

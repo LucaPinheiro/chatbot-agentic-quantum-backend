@@ -25,8 +25,9 @@ settings = load_settings()
 
 class UseCase:
     def __init__(self):
-        self.repo = Repository(session_repo=True, user_repo=True, chat_repo=True)
+        self.repo = Repository(session_repo=True, user_repo=True, chat_repo=True, class_topics_repo=True)
         self.session_repo: ISessionRepository = self.repo.session_repo
+        self.class_topics_repo = self.repo.class_topics_repo
         self.chat_repo: IChatRepository = self.repo.chat_repo
         self.sqs = SQSResources()
         self.llm = OpenAIService(api_key=settings.openai_api_key)
@@ -106,6 +107,11 @@ class UseCase:
         )
         self.chat_repo.save_message(system_msg)
         print("💾 Resposta da LLM salva no banco de dados.")
+        
+        # Envia mensagem para a fila SQS para análise se cumpriu o tópico
+        topics = self.class_topics_repo.get_all_topics_by_class(class_id=session.class_id)
+        
+        self.sqs.send_message(SQSMessage(session_id=session_id, class_id=session.class_id, topics=topics), queue="analyzer")
 
         # 5. Checa necessidade de sumarizar
         if summary_cutoff:
