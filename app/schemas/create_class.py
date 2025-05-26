@@ -3,11 +3,9 @@ from typing import List
 from pydantic import BaseModel, ConfigDict
 
 
-class CreateClassRequest(BaseModel):
-    group_id: str
-    title: str
-    pdf_url: str
-    topics: List[str]  # Apenas os nomes dos tópicos (strings)
+# Schema de entrada para os tópicos da aula (sem class_id)
+class ClassTopicInput(BaseModel):
+    topic: str
 
 
 # Schema de resposta para os tópicos da aula
@@ -20,6 +18,14 @@ class ClassTopicResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# Schema de entrada para criação da aula
+class CreateClassRequest(BaseModel):
+    group_id: str
+    title: str
+    pdf_url: str    
+    class_topics: List[ClassTopicInput]
+
+
 # Schema de resposta completo da criação de uma aula
 class CreateClassResponse(BaseModel):
     class_id: str
@@ -30,6 +36,6 @@ class CreateClassResponse(BaseModel):
     last_access_class: datetime.datetime
     created_at: datetime.datetime
     order: int
-    topics: List[ClassTopicResponse]  # agora é uma lista de objetos, não só strings
+    class_topics: List[ClassTopicResponse]
 
     model_config = ConfigDict(from_attributes=True)

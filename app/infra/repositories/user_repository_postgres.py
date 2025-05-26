@@ -23,6 +23,12 @@ class UserRepositoryPostgres(IUserRepository):
         if not user:
             return None
         return User.from_orm(user)
+    def get_users_by_ids(self, user_ids: List[str]) -> Optional[List[User]]:
+        users = self.db.query(UserModel).filter(UserModel.user_id.in_(user_ids)).all()
+        if not users:
+            return None
+        return [User.from_orm(user) for user in users]
+
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         user = self.db.query(UserModel).filter(UserModel.email == email).first()

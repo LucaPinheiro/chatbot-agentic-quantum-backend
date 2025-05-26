@@ -19,6 +19,8 @@ from app.api.endpoints.group.update_group import router as update_group_router
 from app.api.endpoints.group.get_group_by_id import router as get_group_by_id_router
 from app.api.endpoints.user.delete_user import router as delete_user_router
 from app.api.endpoints.classes.create_class import router as create_class_router
+from app.api.endpoints.group.add_user_group import router as add_user_group_router
+from app.api.endpoints.class_topics.delete_topics_by_id import router as delete_topics_by_id_router
 
 routers = APIRouter()
 
@@ -41,6 +43,8 @@ router_list = [
     get_group_by_id_router,
     delete_user_router,
     create_class_router,
+    add_user_group_router,
+    delete_topics_by_id_router,
 ]
 
 for router in router_list:
