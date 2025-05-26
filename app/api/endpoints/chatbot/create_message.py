@@ -110,7 +110,6 @@ class UseCase:
         
         # Envia mensagem para a fila SQS para análise se cumpriu o tópico
         topics = self.class_topics_repo.get_all_topics_by_class(class_id=session.class_id)
-        
         self.sqs.send_message(SQSMessage(session_id=session_id, class_id=session.class_id, topics=topics), queue="analyzer")
 
         # 5. Checa necessidade de sumarizar
