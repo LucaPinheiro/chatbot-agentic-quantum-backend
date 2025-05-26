@@ -1,16 +1,17 @@
 from abc import abstractmethod
-from typing import Optional, Union
+from typing import List, Optional, Union
 from app.models.models import Group
+from app.schemas.add_user_group import AddUserGroupResponse
 from app.schemas.update_group import UpdateGroupResponse
 
 
 class IGroupRepository:
     @abstractmethod
-    def delete_group(self, name: str) -> object:
+    def delete_group(self, group_id: str, name: str) -> object:
         pass
     
     @abstractmethod
-    def create_group(self, group: Group) -> Group:
+    def create_group(self, group: Group, user_ids: Optional[List[str]] = None) -> Group:
         pass
     @abstractmethod
     def update_group(
@@ -19,7 +20,8 @@ class IGroupRepository:
         name: Optional[str],
         year_semester: Optional[int],
         status: Optional[bool],
-        user_id: Optional[str]
+        manager_id: Optional[str],
+        user_ids: Optional[List[str]] = None
     ) -> Union[UpdateGroupResponse, dict]:
         pass
     @abstractmethod
@@ -30,4 +32,10 @@ class IGroupRepository:
         """
         Verifica se o usuário (professor ou admin) é o gerente do grupo
         """ 
+        pass
+    @abstractmethod
+    def add_user_group(self, user_id: str, group_id: str) -> AddUserGroupResponse:
+        """
+        Adiciona um usuário a um grupo
+        """
         pass
