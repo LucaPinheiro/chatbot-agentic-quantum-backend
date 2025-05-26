@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     redis_port: int = 6379
     
     # --------------- SQS QUEUES ---------------
+    sqs_queue_url: str = ""
     sqs_summarizer_queue_url: str = ""  
     sqs_analyzer_queue_url: str = ""  
 
