@@ -60,7 +60,7 @@ class Controller:
             if request.permission == PermissionLevelEnum.ADMIN:
                 raise UnauthorizedException("Usuário não autorizado a criar um admin")
             if request.permission == PermissionLevelEnum.PROFESSOR:
-                raise UnauthorizedException("Usuário não autorizado a criar um moderador")
+                raise UnauthorizedException("Usuário não autorizado a criar um professor")
             
         
         try:
