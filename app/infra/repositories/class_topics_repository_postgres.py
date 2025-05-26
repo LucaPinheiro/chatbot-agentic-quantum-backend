@@ -1,3 +1,4 @@
+from typing import List, Union
 from sqlalchemy import func
 from app.models.models import ClassTopic, TopicProgress
 from app.helpers.exceptions.exceptions import NotFoundException
@@ -38,3 +39,39 @@ class ClassTopicsRepositoryPostgres:
             "total": total,
             "done": done,
         }
+    
+    def delete_topics_by_id(
+        self,
+        class_topics_id: Union[str, List[str]],
+        class_id: Union[str, List[str]],
+        topic: Union[str, List[str]]
+    ):
+        filters = []
+
+        # class_topics_id
+        if isinstance(class_topics_id, list):
+            filters.append(ClassTopic.class_topics_id.in_(class_topics_id))
+        else:
+            filters.append(ClassTopic.class_topics_id == class_topics_id)
+
+        # class_id
+        if isinstance(class_id, list):
+            filters.append(ClassTopic.class_id.in_(class_id))
+        else:
+            filters.append(ClassTopic.class_id == class_id)
+
+        # topic
+        if isinstance(topic, list):
+            filters.append(ClassTopic.topic.in_(topic))
+        else:
+            filters.append(ClassTopic.topic == topic)
+
+        class_topic = self.db.query(ClassTopic).filter(*filters).first()
+
+        if not class_topic:
+            raise NotFoundException("Tópico não encontrado")
+
+        self.db.delete(class_topic)
+        self.db.commit()
+
+        return {"message": "Tópico deletado com sucesso"}
