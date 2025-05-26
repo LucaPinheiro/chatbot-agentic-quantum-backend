@@ -33,17 +33,18 @@ class UseCase:
             name=schema.name,
             year_semester=schema.year_semester,
             status=schema.status,
-            user_id=schema.user_id,
+            manager_id=schema.manager_id,
         )
 
-        group_created = self.group_repo.create_group(group)
+        self.group_repo.create_group(group, schema.user_ids)
 
         return CreateGroupResponse(
             group_id=new_id,
             name=schema.name,
             year_semester=schema.year_semester,
             status=schema.status,
-            user_id=schema.user_id,
+            manager_id=schema.manager_id,
+            user_ids=schema.user_ids
         )
 
 
@@ -52,8 +53,8 @@ class Controller:
         self.use_case = use_case
 
     def handle(self, request: CreateGroupRequest, user: TokenUser) -> CreateGroupResponse:
-        if user.permission != PermissionLevelEnum.PROFESSOR:
-            raise UnauthorizedException("Somente professores podem criar grupos.")
+        if user.permission not in (PermissionLevelEnum.ADMIN, PermissionLevelEnum.PROFESSOR):
+            raise UnauthorizedException("Somente administradores e professores podem criar grupos.")
                                         
         try:
             return self.use_case.execute(request)
@@ -65,8 +66,8 @@ class Controller:
             raise HTTPException(status_code=400, detail=str(e))
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro inesperado: {str(e)}")
-
-
+        
+        
 @router.post("/group", response_model=CreateGroupResponse, status_code=201)
 def create_group(
     request: CreateGroupRequest,
