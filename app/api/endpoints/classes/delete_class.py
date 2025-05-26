@@ -21,15 +21,14 @@ class UseCase:
         self.classes_repo = self.repository.classes_repo
 
     def execute(self, schema: DeleteClassRequest) -> DeleteClassResponse:
-        classes = self.classes_repo.delete_class(group_id=schema.group_id, title=schema.title)
+        classes = self.classes_repo.delete_class(class_id=schema.class_id, title=schema.title)
         return classes
-
-
 class Controller:
     def __init__(self, use_case: UseCase):
         self.use_case = use_case
     
     def handle(self, request: DeleteClassRequest) -> DeleteClassResponse:
+        
         try:
             return self.use_case.execute(request)
         except NotFoundException as e:
@@ -40,10 +39,10 @@ class Controller:
 
 @router.delete("/delete_class", response_model=DeleteClassResponse)
 async def delete_class(
-    group_id: str,
+    class_id: str,
     title: str,
-    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR))
+    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
-    return controller.handle(request=DeleteClassRequest(group_id=group_id, title=title))
+    return controller.handle(request=DeleteClassRequest(class_id=class_id, title=title))
