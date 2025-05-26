@@ -20,6 +20,7 @@ router = APIRouter()
 class UseCase:
     repository: Repository
     group_repo: IGroupRepository
+    user_repo: IUserRepository
 
     def __init__(self):
         self.repository = Repository(group_repo=True, user_repo=True)
@@ -27,16 +28,37 @@ class UseCase:
         self.user_repo = self.repository.user_repo
 
 
-    def execute(self, group_id: str,  schema: UpdateGroupRequest) -> UpdateGroupResponse:
-        if schema.user_id:
-            user = self.user_repo.get_user_by_id(schema.user_id)
-            if not user:
-                raise NotFoundException(f"Usuário com id '{schema.user_id}' não encontrado.")
-        group_updated = self.group_repo.update_group(group_id=group_id, 
-                                                       name=schema.name, 
-                                                       year_semester=schema.year_semester, 
-                                                       status=schema.status, user_id=schema.user_id)
-        return group_updated
+    def execute(self, group_id: str, schema: UpdateGroupRequest) -> UpdateGroupResponse:
+        if schema.user_ids:
+            for user_id in schema.user_ids:
+                user = self.user_repo.get_users_by_ids([user_id])
+                if not user:
+                    raise NotFoundException(f"Usuário com ID {user_id} não foi encontrado.")
+
+
+        # Atualiza os dados básicos do grupo
+        group = self.group_repo.update_group(
+            group_id=group_id,
+            name=schema.name,
+            year_semester=schema.year_semester,
+            status=schema.status,
+            manager_id=schema.manager_id,
+        )
+
+        # Atualiza relacionamentos se houver user_ids
+        if schema.user_ids:
+            self.group_repo.update_group_enrollments(group_id, schema.user_ids)
+            user_ids = schema.user_ids
+        else:
+            user_ids = self.group_repo.get_group_user_ids(group_id)
+
+        return UpdateGroupResponse(
+            name=group.name,
+            year_semester=group.year_semester,
+            status=group.status,
+            manager_id=group.manager_id,
+            user_ids=user_ids
+        )
 
 class Controller:
     def __init__(self, use_case: UseCase):
