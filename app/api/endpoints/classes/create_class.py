@@ -31,11 +31,15 @@ class UseCase:
         self.user_repo = self.repository.user_repo
         
     def execute(self, schema: CreateClassRequest, user_id: str) -> CreateClassResponse:
+        topic_names = [t.topic.strip().lower() for t in schema.class_topics]
+        if len(set(topic_names)) < len(topic_names):
+            raise DuplicatedException("Tópicos duplicados na requisição.")
+        
         return self.classes_repo.create_class(
             group_id=schema.group_id,
             title=schema.title,
             pdf_url=schema.pdf_url,
-            topics=schema.topics,
+            class_topics=schema.class_topics,
             user_id=user_id
         )
 
