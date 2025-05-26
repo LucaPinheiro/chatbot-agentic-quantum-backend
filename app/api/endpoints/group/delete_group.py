@@ -19,7 +19,9 @@ class UseCase:
         self.group_repo = self.repository.group_repo
 
     def execute(self, schema: DeleteGroupRequest) -> DeleteGroupResponse:
-        group = self.group_repo.delete_group(name=schema.name)
+        group = self.group_repo.delete_group(name=schema.name, group_id=schema.group_id)
+        if not group:
+            raise NotFoundException("Grupo não encontrado com esse ID e nome.")
         return group
 
 
@@ -38,9 +40,10 @@ class Controller:
 
 @router.delete("/delete_group", response_model=DeleteGroupResponse)
 async def delete_group(
+    group_id: str,
     name: str,
     token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
-    return controller.handle(request=DeleteGroupRequest(name=name))
+    return controller.handle(request=DeleteGroupRequest(group_id=group_id, name=name))
