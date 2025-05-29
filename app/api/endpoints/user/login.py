@@ -20,9 +20,17 @@ class UseCase:
         
         if not Encrypt.verify_password(schema.password, user.password):
             raise UnauthorizedException("Senha inválida")
-        print(f"User {user.user_id} esta pra logar in successfully.")
+        
+        print(f"User {user.user_id} está para logar com sucesso.")
+        
         token = JWToken.encode(user_id=user.user_id, permission=user.permission)
-        return LoginResponse(token=token)
+        
+        return LoginResponse(
+            name=user.name,  # supondo que user tenha `name`
+            user_id=user.user_id,
+            permission=user.permission,
+            token=token
+        )
 
 class Controller:
     def __init__(self, use_case: UseCase):

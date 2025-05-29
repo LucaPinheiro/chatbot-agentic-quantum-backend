@@ -22,7 +22,7 @@ async def manage_user_permission(
     user_id = decoded.get("user_id")
     permission = decoded.get("permission")
 
-    if permission is None or permission < required_permission:
+    if permission is None or (permission & required_permission) == 0:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissão insuficiente"
