@@ -60,7 +60,7 @@ async def get_all_progress_class(
     title: str,
     group_id: str,
     token_user: TokenUser = Security(RequirePermission(
-        PermissionLevelEnum.ADMIN or PermissionLevelEnum.PROFESSOR or PermissionLevelEnum.STUDENT
+        PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR | PermissionLevelEnum.STUDENT
     ))
 ):
     use_case = UseCase()
