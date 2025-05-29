@@ -69,7 +69,7 @@ async def get_progress_percentual_by_class(
     class_id: str,
     user_id: Optional[str] = Query(None, description="ID do aluno (obrigatório para admin/professor)"),
     token_user: TokenUser = Security(RequirePermission(
-        PermissionLevelEnum.ADMIN or PermissionLevelEnum.PROFESSOR or PermissionLevelEnum.STUDENT
+        PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR | PermissionLevelEnum.STUDENT
     ))
 ):
     use_case = UseCase()
