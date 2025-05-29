@@ -59,7 +59,7 @@ class Controller:
 async def get_progress_percentual_by_group(
     name: str,
     token_user: TokenUser = Security(RequirePermission(
-        PermissionLevelEnum.ADMIN or PermissionLevelEnum.PROFESSOR or PermissionLevelEnum.STUDENT
+        PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR | PermissionLevelEnum.STUDENT
     ))
 ):
     use_case = UseCase()
