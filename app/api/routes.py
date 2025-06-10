@@ -14,7 +14,7 @@ from app.api.endpoints.group.delete_group import router as delete_group_router
 from app.api.endpoints.classes.delete_class import router as delete_class_router
 from app.api.endpoints.group.create_group import router as create_group_router
 from app.api.endpoints.classes.get_all_classes import router as get_all_classes_router
-from app.api.endpoints.classes.update_class import router as update_class_router
+# from app.api.endpoints.classes.update_class import router as update_class_router
 from app.api.endpoints.group.update_group import router as update_group_router
 from app.api.endpoints.group.get_group_by_id import router as get_group_by_id_router
 from app.api.endpoints.user.delete_user import router as delete_user_router
@@ -38,13 +38,14 @@ router_list = [
     delete_class_router,
     create_group_router,
     get_all_classes_router,
-    update_class_router,
+    # update_class_router,
     update_group_router,
     get_group_by_id_router,
     delete_user_router,
     create_class_router,
     add_user_group_router,
     delete_topics_by_id_router,
+    create_class_router
 ]
 
 for router in router_list:
