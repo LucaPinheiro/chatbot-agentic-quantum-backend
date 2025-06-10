@@ -4,6 +4,7 @@ from app.domain.interfaces.classes_repository import IClassesRepository
 from app.helpers.enums.enums import PermissionLevelEnum
 from app.helpers.exceptions.exceptions import NotFoundException, UnauthorizedException
 from app.infra.repository import Repository
+from app.schemas.get_all_progress_class import GetAllProgressClassRequest, GetAllProgressClassResponse
 from app.schemas.get_class_progress_percentual_by_class import GetClassProgressPercentualByClassRequest, GetClassProgressPercentualByClassResponse
 from app.schemas.token import TokenUser
 from fastapi import APIRouter, Query, Security, HTTPException
@@ -20,26 +21,17 @@ class UseCase:
         self.repository = repository or Repository(class_topics_repo=True)
         self.class_topics_repo = self.repository.class_topics_repo
 
-    def execute(self, schema: GetClassProgressPercentualByClassRequest, token_user: TokenUser) -> GetClassProgressPercentualByClassResponse:
-        # Decidir o user_id conforme o perfil
-        if token_user.permission == PermissionLevelEnum.STUDENT:
-            user_id = token_user.id
-        else:
-            if not schema.user_id:
-                raise UnauthorizedException("user_id é obrigatório para admin e professor.")
-            user_id = schema.user_id
-
-        progress_data = self.class_topics_repo.get_progress_percentual_by_class(
-            class_id=schema.class_id,
-            user_id=user_id
+    def execute(self, schema: GetAllProgressClassRequest) -> GetAllProgressClassResponse:
+        progress_data = self.class_topics_repo.get_all_progress_class(
+            title=schema.title,
+            group_id=schema.group_id
         )
 
-        return GetClassProgressPercentualByClassResponse(
-            class_id=progress_data.class_id,
-            user_id=user_id,
-            class_progress_percentual=progress_data.class_progress_percentual,
+        return GetAllProgressClassResponse(
+            title=progress_data.title,
+            progress=progress_data.progress,
             total=progress_data.total,
-            done=progress_data.done,
+            done=progress_data.done
         )
 
 
@@ -50,12 +42,11 @@ class Controller:
 
     def handle(
         self, 
-        request: GetClassProgressPercentualByClassRequest, 
-        token_user: TokenUser
-    ) -> GetClassProgressPercentualByClassResponse:
+        request: GetAllProgressClassRequest, 
+    ) -> GetAllProgressClassResponse:
         
         try:
-            return self.use_case.execute(request, token_user)
+            return self.use_case.execute(request)
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=e.message)
         except UnauthorizedException as e:
@@ -64,10 +55,10 @@ class Controller:
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/class_progress", response_model=GetClassProgressPercentualByClassResponse)
-async def get_progress_percentual_by_class(
-    class_id: str,
-    user_id: Optional[str] = Query(None, description="ID do aluno (obrigatório para admin/professor)"),
+@router.get("/all_class_progress", response_model=GetAllProgressClassResponse)
+async def get_all_progress_class(
+    title: str,
+    group_id: str,
     token_user: TokenUser = Security(RequirePermission(
         PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR | PermissionLevelEnum.STUDENT
     ))
@@ -75,9 +66,8 @@ async def get_progress_percentual_by_class(
     use_case = UseCase()
     controller = Controller(use_case=use_case)
     return controller.handle(
-        GetClassProgressPercentualByClassRequest(
-            class_id=class_id,
-            user_id=user_id
-        ),
-        token_user
+        GetAllProgressClassRequest(
+            title=title,
+            group_id=group_id
+        )
     )
