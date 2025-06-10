@@ -218,6 +218,8 @@ class ClassesRepositoryPostgres(IClassesRepository):
     
     def get_all_classes_by_user(self, user_id: str) -> List[GetAllClassesByUserResponse]:
         group = self.db.query(GroupEnrollment).filter(GroupEnrollment.student_id == user_id).first()
+        if not group:
+            raise NotFoundException("Nenhuma inscrição de grupo encontrada para o usuário.")
         classes = self.db.query(ClassModel).filter(ClassModel.group_id == group.group_id).all()
         if not classes:
             raise NotFoundException("Nenhuma aula encontrada para o usuário.")
