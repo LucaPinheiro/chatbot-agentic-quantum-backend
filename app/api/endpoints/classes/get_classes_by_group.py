@@ -50,8 +50,8 @@ class UseCase:
             GetClassesResponse(
                 class_id=c.class_id,
                 group_id=c.group_id,
+                manager_id=c.manager_id,
                 title=c.title,
-                pdf_url=c.pdf_url,
                 status=c.status,
                 last_access_class=c.last_access_class,
                 created_at=c.created_at,
