@@ -1,5 +1,6 @@
 from typing import List, Union
 from sqlalchemy import func
+from app.domain.entities.class_topics import ClassTopics as ClassTopicsEntity
 from app.models.models import ClassTopic, TopicProgress
 from app.helpers.exceptions.exceptions import NotFoundException
 
@@ -74,4 +75,10 @@ class ClassTopicsRepositoryPostgres:
         self.db.delete(class_topic)
         self.db.commit()
 
-        return {"message": "Tópico deletado com sucesso"}
+        return {"message": "Tópico deletado com sucesso"}\
+            
+    def create_class_topic(self, class_topic: ClassTopicsEntity) -> None:
+        class_topic_orm  = class_topic.to_orm()  # <- converte aqui
+        self.db.add(class_topic_orm)
+        self.db.commit()
+        self.db.refresh(class_topic_orm)
