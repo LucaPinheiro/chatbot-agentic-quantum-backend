@@ -18,6 +18,7 @@ class User(Base):
     permission = Column(Integer, nullable=False)
     created_at = Column(DateTime, nullable=False)
 
+    classes = relationship("ClassModel", back_populates="manager", cascade="all, delete-orphan", passive_deletes=True)
     groups = relationship("Group", back_populates="manager", passive_deletes=True)
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
     class_topics = relationship("ClassTopic", back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
@@ -55,15 +56,15 @@ class ClassModel(Base):
 
     class_id = Column(String, primary_key=True)
     group_id = Column(String, ForeignKey("groups.group_id", ondelete="CASCADE"), nullable=False)
+    manager_id = Column(String, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=False)
-    pdf_url = Column(String)
     status = Column(Boolean, default=True)
-    last_access_class = Column(DateTime)
     created_at = Column(DateTime, nullable=False)
     order = Column(Integer)
 
-    group = relationship("Group", back_populates="classes", passive_deletes=True)
     class_topics = relationship("ClassTopic", back_populates="class_", cascade="all, delete-orphan", passive_deletes=True)
+    manager = relationship("User", back_populates="classes", passive_deletes=True)
+    group = relationship("Group", back_populates="classes", passive_deletes=True)
     sessions = relationship("Session", back_populates="class_", cascade="all, delete-orphan", passive_deletes=True)
 
 # ──────────────── ClassTopic ────────────────
@@ -74,6 +75,7 @@ class ClassTopic(Base):
     topic = Column(String, nullable=False)
     class_id = Column(String, ForeignKey("classes.class_id", ondelete="CASCADE"), nullable=False)
     user_id = Column(String, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    pdf_url = Column(String)
 
     class_ = relationship("ClassModel", back_populates="class_topics", passive_deletes=True)
     user = relationship("User", back_populates="class_topics", passive_deletes=True)
