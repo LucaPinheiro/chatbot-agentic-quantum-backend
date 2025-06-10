@@ -26,7 +26,7 @@ class ClassModel(BaseModel):
         )
         
     def to_orm(self) -> ClassModelORM:
-        return ClassModel(
+        return ClassModelORM(
             class_id=self.class_id,
             group_id=self.group_id,
             manager_id=self.manager_id,
