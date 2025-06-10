@@ -35,3 +35,6 @@ class IClassesRepository:
         user_id: str,
     ) -> CreateClassResponse:
         pass
+    @abstractmethod
+    def get_all_classes_by_user(self, user_id: str) -> List[ClassModel]:
+        pass
