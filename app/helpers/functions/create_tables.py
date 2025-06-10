@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session as SQLAlchemySession
 from datetime import datetime
 from app.core.settings import load_settings
-from app.models.models import Base, User, Group, ClassModel, GroupEnrollment, Session as UserSession
+from app.models.models import Base, ClassTopic, User, Group, ClassModel, GroupEnrollment, Session as UserSession
 from app.helpers.utils.encrypt import Encrypt
 
 
@@ -71,14 +71,23 @@ def create_db_tables():
                 class_ = ClassModel(
                     class_id="class-id-001",
                     group_id=group.group_id,
+                    manager_id=professor.user_id,
                     title="Introdução ao Python",
-                    pdf_url="https://example.com/python_intro.pdf",
                     status=True,
-                    last_access_class=now,
                     created_at=now,
                     order=1
                 )
                 session.add(class_)
+                
+                class_topics = ClassTopic(
+                    class_topics_id="topic-id-001",
+                    topic="Introdução ao Python",
+                    class_id=class_.class_id,
+                    pdf_url="https://example.com/python_intro.pdf",
+                    user_id=professor.user_id,
+                )
+                
+                session.add(class_topics)
 
                 # Matricular o aluno no Group
                 enrollment = GroupEnrollment(
