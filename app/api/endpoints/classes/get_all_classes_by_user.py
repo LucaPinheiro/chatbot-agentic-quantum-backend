@@ -54,7 +54,7 @@ class Controller:
 @router.get("/classes/user", response_model=List[GetAllClassesByUserResponse])
 async def get_all_classes_by_user(
     user_id: str,
-    token_user: TokenUser = Security(RequirePermission([PermissionLevelEnum.ADMIN, PermissionLevelEnum.USER, PermissionLevelEnum.PROFESSOR]))
+    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.STUDENT))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)

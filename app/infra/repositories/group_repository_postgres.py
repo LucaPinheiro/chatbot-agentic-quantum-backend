@@ -156,8 +156,8 @@ class GroupRepositoryPostgres:
             group_id=group_id,
             message=f"Usuário {user_id} adicionado ao grupo {group_id} com sucesso."
         )
-        
-    def get_all_groups(self) -> List[GetAllGroupsResponse]:
+      
+      def get_all_groups(self) -> List[GetAllGroupsResponse]:
         groups = self.db.query(Group).all()
         if not groups:
             raise NotFoundException("Nenhum grupo encontrado.")
@@ -173,6 +173,6 @@ class GroupRepositoryPostgres:
                     manager_id=group.manager_id
                 )
             )
-        
-        return group_list
+
+        return group_list    
     

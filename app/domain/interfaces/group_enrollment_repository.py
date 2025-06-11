@@ -10,3 +10,10 @@ class IGroupEnrollmentRepository(ABC):
     """
     pass
   
+  @abstractmethod
+  def get_all_students_by_group_id(self, group_id: str) -> list:
+    """
+    Retorna todos os alunos matriculados no grupo
+    """
+    pass
+  
