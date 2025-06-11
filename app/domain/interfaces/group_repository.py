@@ -39,3 +39,9 @@ class IGroupRepository:
         Adiciona um usuário a um grupo
         """
         pass
+    @abstractmethod
+    def get_all_groups(self) -> List[Group]:
+        """
+        Retorna todos os grupos
+        """
+        pass
