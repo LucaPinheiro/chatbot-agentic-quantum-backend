@@ -52,7 +52,7 @@ router_list = [
     add_topics_to_class_router,
     get_all_progress_class_router,
     get_progress_percentual_by_group_router,
-    get_all_classes_by_user_router
+    get_all_classes_by_user_router,
     create_class_router
 ]
 
