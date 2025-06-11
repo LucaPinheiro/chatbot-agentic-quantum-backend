@@ -29,3 +29,11 @@ class SessionRepositoryPostgres(ISessionRepository):
         if not session:
             return None
         return [Session.from_orm(session) for session in session]
+    
+    def get_session_by_class_id(self, class_id: str, user_id: str) -> Optional[Session]:
+        session = self.db.query(SessionModel).filter(
+            SessionModel.class_id == class_id,
+            SessionModel.user_id == user_id
+        ).first()
+        
+        return Session.from_orm(session)

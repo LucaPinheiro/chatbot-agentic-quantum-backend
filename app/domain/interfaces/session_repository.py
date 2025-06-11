@@ -20,3 +20,8 @@ class ISessionRepository(ABC):
     def create_sessions(self, sessions: List[Session]) -> None:
         """Create a new session in the database."""
         pass
+    
+    @abstractmethod
+    def get_session_by_class_id(self, class_id: str, user_id: str) -> Optional[Session]:
+        """Retrieve session details by class ID and user ID."""
+        pass
