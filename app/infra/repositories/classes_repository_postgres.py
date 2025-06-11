@@ -52,21 +52,23 @@ class ClassesRepositoryPostgres(IClassesRepository):
 
     
     def get_all_classes(self) -> List[GetAllClassesResponse]:
-        classes = self.db.query(ClassEntity).all()
-        return [
-            GetAllClassesResponse(
-                class_id=cls.class_id,
-                group_id=cls.group_id,
-                topic_id=cls.topic_id,
-                manager_id=cls.manager_id,
-                title=cls.title,
-                status=cls.status,
-                last_access_class=cls.last_access_class,
-                created_at=cls.created_at,
-                order=cls.order
+        classes = self.db.query(ClassORM).all()
+        result = []
+
+        for cls in classes:
+            result.append(
+                GetAllClassesResponse(
+                    class_id=cls.class_id,
+                    group_id=cls.group_id,
+                    manager_id=cls.manager_id,
+                    title=cls.title,
+                    status=cls.status,
+                    created_at=cls.created_at,
+                    order=cls.order
+                )
             )
-            for cls in classes
-        ]
+
+        return result
 
     # def update_class(self, class_id: str, group_id: Optional[str], title: Optional[str], 
     #                  pdf_url: Optional[str], status: Optional[bool], order: Optional[int]) -> Union[UpdateClassResponse, dict]:
