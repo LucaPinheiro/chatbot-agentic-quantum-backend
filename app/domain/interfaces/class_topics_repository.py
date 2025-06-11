@@ -14,7 +14,7 @@ class IClassTopicsRepository(ABC):
         """
         pass
     @abstractmethod
-    def create_class_topic(self, class_topic: ClassTopics) -> ClassTopics:
+    def create_class_topics(self, topics: List[ClassTopics]) -> None:
         """
         Cria um tópico de aula
         """
