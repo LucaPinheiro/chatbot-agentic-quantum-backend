@@ -43,21 +43,30 @@ class UseCase:
         results = self.topic_progress_repo.get_progress_by_group_and_user(schema.group_id, user_id=token_user.id)
 
         class_progress_data = []
+        total_geral_topicos = 0
+        total_geral_concluidos = 0
+
         for result in results:
-            # Alteração aqui: usando o novo nome do alias "completed_topics"
-            progresso = (result.completed_topics / result.total_topics) * 100 if result.total_topics > 0 else 0
+            total_geral_topicos += result.total_topics
+            total_geral_concluidos += result.completed_topics
+
+            progresso_aula = (result.completed_topics / result.total_topics) * 100 if result.total_topics > 0 else 0
+            
             class_progress_data.append(
                 ClassProgressResponse(
                     class_id=result.class_id,
                     title=result.title,
-                    progresso=f"{int(progresso)}%" # Convertido para int para um visual mais limpo
+                    progresso=f"{int(progresso_aula)}%"
                 )
             )
+
+        progresso_geral = (total_geral_concluidos / total_geral_topicos) * 100 if total_geral_topicos > 0 else 0
             
         return GetMyProgressResponse(
             user_id=user.user_id,
             name=user.name,
             group_id=schema.group_id,
+            progresso_geral=f"{int(progresso_geral)}%", 
             classes=class_progress_data
         )
 
