@@ -9,8 +9,7 @@ class GetClassesResponse(BaseModel):
     class_id : str
     group_id : str
     title : str
-    pdf_url : str
+    manager_id: str
     status : bool
-    last_access_class : datetime
     created_at : datetime
     order : int
