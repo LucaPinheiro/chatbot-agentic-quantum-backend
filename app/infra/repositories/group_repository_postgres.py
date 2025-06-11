@@ -5,6 +5,7 @@ from app import schemas
 from app.helpers.exceptions.exceptions import NotFoundException
 from app.models.models import Group, GroupEnrollment, User
 from app.schemas.add_user_group import AddUserGroupResponse
+from app.schemas.get_all_groups import GetAllGroupsResponse
 from app.schemas.update_group import UpdateGroupResponse
 
 
@@ -155,4 +156,23 @@ class GroupRepositoryPostgres:
             group_id=group_id,
             message=f"Usuário {user_id} adicionado ao grupo {group_id} com sucesso."
         )
+        
+    def get_all_groups(self) -> List[GetAllGroupsResponse]:
+        groups = self.db.query(Group).all()
+        if not groups:
+            raise NotFoundException("Nenhum grupo encontrado.")
+
+        group_list = []
+        for group in groups:
+            group_list.append(
+                GetAllGroupsResponse(
+                    group_id=group.group_id,
+                    name=group.name,
+                    year_semester=group.year_semester,
+                    status=group.status,
+                    manager_id=group.manager_id
+                )
+            )
+        
+        return group_list
     
