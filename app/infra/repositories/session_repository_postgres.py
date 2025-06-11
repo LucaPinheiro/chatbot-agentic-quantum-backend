@@ -31,9 +31,12 @@ class SessionRepositoryPostgres(ISessionRepository):
         return [Session.from_orm(session) for session in session]
     
     def get_session_by_class_id(self, class_id: str, user_id: str) -> Optional[Session]:
+        print(f"Consultando sessão com class_id={class_id} e user_id={user_id}")
         session = self.db.query(SessionModel).filter(
             SessionModel.class_id == class_id,
             SessionModel.user_id == user_id
         ).first()
+        print(f"Sessão encontrada: {session}")
         
-        return Session.from_orm(session)
+        return Session.from_orm(session) if session else None
+
