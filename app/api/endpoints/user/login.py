@@ -29,6 +29,7 @@ class UseCase:
             name=user.name,  # supondo que user tenha `name`
             user_id=user.user_id,
             permission=user.permission,
+            created_at=user.created_at,  
             token=token
         )
 
