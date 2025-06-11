@@ -14,3 +14,4 @@ class GetMyProgressResponse(BaseModel):
     name: str
     group_id: str
     classes: List[ClassProgressResponse]
+    progresso_geral: str
