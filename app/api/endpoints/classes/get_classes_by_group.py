@@ -22,27 +22,26 @@ class UseCase:
     group_enrollment_repo: IGroupEnrollmentRepository
 
     def __init__(self):
-        self.repository = Repository(classes_repo=True, group_enrollment_repo=True)
+        self.repository = Repository(classes_repo=True, group_repo=True, group_enrollment_repo=True)
         self.classes_repo = self.repository.classes_repo
         self.group_repo = self.repository.group_repo
         self.group_enrollment_repo = self.repository.group_enrollment_repo
     
     def execute(self, schema: GetClassesRequest, token_user: TokenUser) -> List[GetClassesResponse]:
-        
         if (token_user.permission == PermissionLevelEnum.STUDENT):
             is_student = self.repository.group_enrollment_repo.is_student(
                 group_id=schema.group_id,
-                student_id=token_user.user_id
+                student_id=token_user.id
             )
-            if is_student is False:
+            if not is_student:
                 raise UnauthorizedException("User is not authorized to access this group.")
-            
+        
         if (token_user.permission == PermissionLevelEnum.PROFESSOR):
             is_professor = self.repository.group_repo.is_manager_group(
                 group_id=schema.group_id,
                 manager_id=token_user.user_id
             )
-            if is_professor is False:
+            if not is_professor:
                 raise UnauthorizedException("User is not authorized to access this group.")
         
         classes = self.classes_repo.get_classes_by_group(group_id=schema.group_id)
@@ -53,12 +52,12 @@ class UseCase:
                 manager_id=c.manager_id,
                 title=c.title,
                 status=c.status,
-                last_access_class=c.last_access_class,
                 created_at=c.created_at,
                 order=c.order
             )
             for c in classes
         ]
+
 
 class Controller:   
     def __init__(self, use_case: UseCase):
