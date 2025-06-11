@@ -1,5 +1,7 @@
 from typing import List
 from typing import Optional
+from fastapi import HTTPException
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
@@ -49,4 +51,32 @@ class UserRepositoryPostgres(IUserRepository):
         self.db.commit()
 
         return {"message": "User deleted successfully"}
+    
+    def update_user(
+        self,
+        user_id: str,
+        name: Optional[str] = None,
+        email: Optional[EmailStr] = None,
+        password: Optional[str] = None
+    ) -> User:
+        user = self.db.query(UserModel).filter(UserModel.user_id == user_id).first()
+        if not user:
+            raise NotFoundException("Usuário não encontrado.")
 
+        # Verifica se o novo email já está sendo usado por outro usuário
+        if email and email != user.email:
+            existing_user = self.db.query(UserModel).filter(UserModel.email == email).first()
+            if existing_user:
+                raise HTTPException(detail="Este email já está sendo usado por outro usuário.")
+
+        if name:
+            user.name = name
+        if email:
+            user.email = email
+        if password:
+            user.password = password
+
+        self.db.commit()
+        self.db.refresh(user)
+
+        return User.from_orm(user)

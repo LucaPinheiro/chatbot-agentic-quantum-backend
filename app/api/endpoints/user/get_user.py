@@ -33,7 +33,8 @@ class UseCase:
             user_id=user.user_id,
             name=user.name,
             email=user.email,
-            permission=user.permission
+            permission=user.permission,
+            created_at=user.created_at
         )
 
 

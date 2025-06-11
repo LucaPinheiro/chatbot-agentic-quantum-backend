@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
+from pydantic import EmailStr
+
 from app.domain.entities.user import User
 
 
@@ -23,4 +25,8 @@ class IUserRepository(ABC):
     
     @abstractmethod
     def delete_user(self, user_id: str, name: str):
+        pass
+    
+    @abstractmethod
+    def update_user(self, user_id: str, name: Optional[str] = None, email: Optional[EmailStr] = None, password: Optional[str] = None) -> User:
         pass
