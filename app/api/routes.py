@@ -23,6 +23,10 @@ from app.api.endpoints.group.add_user_group import router as add_user_group_rout
 from app.api.endpoints.class_topics.delete_topics_by_id import router as delete_topics_by_id_router
 from app.api.endpoints.user.update_user import router as update_user_router
 from app.api.endpoints.group.get_all_groups import router as get_all_groups_router
+from app.api.endpoints.class_topics.add_topics_to_class import router as add_topics_to_class_router
+from app.api.endpoints.class_topics.get_all_progress_class import router as get_all_progress_class_router
+from app.api.endpoints.class_topics.get_progress_percentual_by_group import router as get_progress_percentual_by_group_router
+from app.api.endpoints.classes.get_all_classes_by_user import router as get_all_classes_by_user_router
 
 routers = APIRouter()
 
@@ -49,7 +53,12 @@ router_list = [
     delete_topics_by_id_router,
     create_class_router,
     update_user_router,
-    get_all_groups_router
+    get_all_groups_router,
+    add_topics_to_class_router,
+    get_all_progress_class_router,
+    get_progress_percentual_by_group_router,
+    get_all_classes_by_user_router,
+    create_class_router
 ]
 
 for router in router_list:

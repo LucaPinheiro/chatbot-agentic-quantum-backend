@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.models.models import User as UserModel
 
 from app.schemas.get_all_classes import GetAllClassesResponse
+from app.schemas.get_all_classes_by_user import GetAllClassesByUserResponse
 from app.schemas.update_class import UpdateClassResponse
 
 
@@ -101,3 +102,24 @@ class ClassesRepositoryPostgres(IClassesRepository):
             .first()
         )
         return (last_class.order + 1) if last_class else 1
+    
+    def get_all_classes_by_user(self, user_id: str) -> List[GetAllClassesByUserResponse]:
+        group = self.db.query(GroupEnrollment).filter(GroupEnrollment.student_id == user_id).first()
+        if not group:
+            raise NotFoundException("Nenhuma inscrição de grupo encontrada para o usuário.")
+        classes = self.db.query(ClassModel).filter(ClassModel.group_id == group.group_id).all()
+        if not classes:
+            raise NotFoundException("Nenhuma aula encontrada para o usuário.")
+        return [
+            GetAllClassesByUserResponse(
+                class_id=cls.class_id,
+                group_id=cls.group_id,
+                title=cls.title,
+                pdf_url=cls.pdf_url,
+                status=cls.status,
+                last_access_class=cls.last_access_class,
+                created_at=cls.created_at,
+                order=cls.order
+            )
+                for cls in classes
+        ] 
