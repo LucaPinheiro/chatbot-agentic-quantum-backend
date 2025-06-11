@@ -10,3 +10,7 @@ class ITopicProgressRepository(ABC):
     def create_topic_progress(self, topic_progress: List[TopicProgress]) -> None:
         """Create class topics in the database."""
         pass
+    
+    @abstractmethod
+    def get_progress_by_group_and_user(self, group_id: str, user_id: str):
+        pass
