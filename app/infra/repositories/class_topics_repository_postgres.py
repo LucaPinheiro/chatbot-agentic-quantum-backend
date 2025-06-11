@@ -77,8 +77,8 @@ class ClassTopicsRepositoryPostgres:
 
         return {"message": "Tópico deletado com sucesso"}\
             
-    def create_class_topic(self, class_topic: ClassTopicsEntity) -> None:
-        class_topic_orm  = class_topic.to_orm()  # <- converte aqui
-        self.db.add(class_topic_orm)
+    def create_class_topics(self, topics: List[ClassTopicsEntity]) -> None:
+        orm_objects = [topic.to_orm() for topic in topics]
+        self.db.add_all(orm_objects)
         self.db.commit()
-        self.db.refresh(class_topic_orm)
+
