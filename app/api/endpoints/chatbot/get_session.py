@@ -24,11 +24,14 @@ class UseCase:
     def execute(self, schema: GetSessionRequest, user: TokenUser) -> GetSessionResponse:
         # Se a consulta pelo class_id retornar uma sessão, então retorna
         session = None
+        print('helo')
         if schema.class_id:
+            print(schema.class_id)
             session = self.session_repo.get_session_by_class_id(schema.class_id, user.id)
         if not session:
+            print("caiu aqui")
             raise NotFoundException("Sessão não encontrada com os dados informados")
-
+            
         return GetSessionResponse(session_id=session.session_id)
 
 
