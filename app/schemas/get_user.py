@@ -3,6 +3,7 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 from typing import Optional
 from app.helpers.enums.enums import PermissionLevelEnum
+from datetime import datetime
 
 
 class GetUserRequest(BaseModel):
@@ -24,3 +25,4 @@ class GetUserResponse(BaseModel):
     name: str
     email: EmailStr
     permission: Optional[PermissionLevelEnum] = None
+    created_at: datetime
