@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.domain.interfaces.classes_repository import IClassesRepository
 from app.helpers.exceptions.exceptions import NotFoundException
 from app.domain.entities.classes import ClassModel as ClassEntity
-from app.models.models import ClassModel as ClassORM
+from app.models.models import ClassModel as ClassORM, GroupEnrollment
 from sqlalchemy.orm import Session
 from app.models.models import User as UserModel
 
@@ -107,7 +107,7 @@ class ClassesRepositoryPostgres(IClassesRepository):
         group = self.db.query(GroupEnrollment).filter(GroupEnrollment.student_id == user_id).first()
         if not group:
             raise NotFoundException("Nenhuma inscrição de grupo encontrada para o usuário.")
-        classes = self.db.query(ClassModel).filter(ClassModel.group_id == group.group_id).all()
+        classes = self.db.query(ClassORM).filter(ClassORM.group_id == group.group_id).all()
         if not classes:
             raise NotFoundException("Nenhuma aula encontrada para o usuário.")
         return [
