@@ -9,6 +9,7 @@ from app.domain.interfaces.file_repository import IFileRepository
 from app.domain.interfaces.group_enrollment_repository import IGroupEnrollmentRepository
 from app.domain.interfaces.group_repository import IGroupRepository
 from app.domain.interfaces.session_repository import ISessionRepository
+from app.domain.interfaces.topic_progress_repository import ITopicProgressRepository
 from app.domain.interfaces.user_repository import IUserRepository
 
 from app.core.settings import load_settings, StageEnum
@@ -22,6 +23,7 @@ from app.infra.repositories.file_repository_s3 import FileRepositoryS3
 from app.infra.repositories.group_enrollment_postgres import GroupEnrollmentPostgres
 from app.infra.repositories.group_repository_postgres import GroupRepositoryPostgres
 from app.infra.repositories.session_repository_postgres import SessionRepositoryPostgres
+from app.infra.repositories.topic_progress_repository_postgres import TopicProgressRepositoryPostgres
 from app.infra.repositories.user_repository_postgres import UserRepositoryPostgres
 
 settings = load_settings()
@@ -36,24 +38,25 @@ class Repository:
     class_topics_repo: IClassTopicsRepository
     group_repo: IGroupRepository
     group_enrollment_repo: IGroupEnrollmentRepository
+    topic_progress_repo: ITopicProgressRepository
 
     def __init__(self, user_repo: bool = False, file_repo: bool = False, session_repo: bool = False,
                  chat_repo: bool = False, classes_repo: bool = False, class_topics_repo: bool = False,
-                 group_repo: bool = False, group_enrollment_repo: bool = False):
+                 group_repo: bool = False, group_enrollment_repo: bool = False, topic_progress_repo: bool = False):
         self.session = None
 
         if settings.stage == StageEnum.test:
             self._initialize_mock_repositories(user_repo)
         else:
             self._initialize_real_repositories(user_repo, file_repo, session_repo, chat_repo, classes_repo,
-                                               class_topics_repo, group_repo, group_enrollment_repo)
+                                               class_topics_repo, group_repo, group_enrollment_repo, topic_progress_repo)
 
     def _initialize_mock_repositories(self, user_repo):
         if user_repo:
             self.user_repo = UserRepoMock()
 
     def _initialize_real_repositories(self, user_repo, file_repo, session_repo, chat_repo, classes_repo,
-                                      class_topics_repo, group_repo, group_enrollment_repo):
+                                      class_topics_repo, group_repo, group_enrollment_repo, topic_progress_repo):
         self.session = self.__connect_db()
         
         if classes_repo:
@@ -81,6 +84,9 @@ class Repository:
             dynamo_config = DynamoConfig(table_name=settings.dynamodb_table_messages)
             dynamo = DynamoDBResources(dynamo_config)
             self.chat_repo = ChatRepositoryDynamo(dynamo)
+            
+        if topic_progress_repo:
+            self.topic_progress_repo = TopicProgressRepositoryPostgres(self.session)
             
 
     def close_session(self):

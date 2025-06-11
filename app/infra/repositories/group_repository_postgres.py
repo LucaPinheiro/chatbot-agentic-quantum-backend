@@ -155,4 +155,6 @@ class GroupRepositoryPostgres:
             group_id=group_id,
             message=f"Usuário {user_id} adicionado ao grupo {group_id} com sucesso."
         )
+        
+
     
