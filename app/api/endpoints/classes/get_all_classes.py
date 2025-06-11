@@ -28,10 +28,9 @@ class UseCase:
             GetAllClassesResponse(
                 class_id=cls.class_id,
                 group_id=cls.group_id,
+                manager_id=cls.manager_id,
                 title=cls.title,
-                pdf_url=cls.pdf_url,
                 status=cls.status,
-                last_access_class=cls.last_access_class,
                 created_at=cls.created_at,
                 order=cls.order
             )
@@ -52,7 +51,7 @@ class Controller:
         
 @router.get("/classes/all", response_model=List[GetAllClassesResponse])
 async def get_all_classes(
-    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN))
+    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.STUDENT))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)
