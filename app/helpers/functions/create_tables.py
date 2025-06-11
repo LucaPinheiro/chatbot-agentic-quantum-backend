@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session as SQLAlchemySession
 from datetime import datetime
 from app.core.settings import load_settings
-from app.models.models import Base, ClassTopic, User, Group, ClassModel, GroupEnrollment, Session as UserSession
+from app.models.models import Base, ClassTopic, TopicProgress, User, Group, ClassModel, GroupEnrollment, Session as UserSession
 from app.helpers.utils.encrypt import Encrypt
 
 
@@ -88,6 +88,15 @@ def create_db_tables():
                 )
                 
                 session.add(class_topics)
+                
+                topic_progress = TopicProgress(
+                    topic_progress_id="topic-progress-id-001",
+                    class_id=class_.class_id,
+                    user_id=aluno.user_id,
+                    flag=False
+                )
+                
+                session.add(topic_progress)
 
                 # Matricular o aluno no Group
                 enrollment = GroupEnrollment(
