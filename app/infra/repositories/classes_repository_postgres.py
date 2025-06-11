@@ -122,12 +122,18 @@ class ClassesRepositoryPostgres(IClassesRepository):
             GetAllClassesByUserResponse(
                 class_id=cls.class_id,
                 group_id=cls.group_id,
+                manager_id=cls.manager_id,
                 title=cls.title,
-                pdf_url=cls.pdf_url,
                 status=cls.status,
-                last_access_class=cls.last_access_class,
                 created_at=cls.created_at,
                 order=cls.order
             )
                 for cls in classes
         ] 
+
+    def get_class_by_class_id(self, class_id: str) -> ClassORM | None:
+        return (
+            self.db.query(ClassORM)
+            .filter(ClassORM.class_id == class_id)
+            .first()
+        )

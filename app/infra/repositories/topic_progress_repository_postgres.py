@@ -10,7 +10,10 @@ class TopicProgressRepositoryPostgres:
     def create_topic_progress(self, topic_progress: List[TopicProgress]) -> None:
         orm_objects = [topic.to_orm() for topic in topic_progress]
         self.db.add_all(orm_objects)  
-        self.db.commit()               
+        self.db.commit()  
+    def add_topic_progress(self, entries: List[TopicProgress]) -> None:
+        self.db.add_all(entries)
+        self.db.commit()             
 
 
     

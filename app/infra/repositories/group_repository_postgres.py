@@ -164,15 +164,29 @@ class GroupRepositoryPostgres:
 
         group_list = []
         for group in groups:
+            # Consulta os usuários matriculados via GroupEnrollment
+            users_id = (
+                self.db.query(GroupEnrollment.student_id)
+                .filter(GroupEnrollment.group_id == group.group_id)
+                .all()
+            )
+            # `user_ids` vem como lista de tuplas, ex: [(1,), (2,), ...]
+            users_id = [uid[0] for uid in users_id]
+
             group_list.append(
                 GetAllGroupsResponse(
                     group_id=group.group_id,
                     name=group.name,
                     year_semester=group.year_semester,
                     status=group.status,
-                    manager_id=group.manager_id
+                    manager_id=group.manager_id,
+                    users_id=users_id
                 )
             )
 
-        return group_list    
+        return group_list
+    
+    
+    def get_group_by_manager_id(self, user_id: str) -> Group | None:
+        return self.db.query(Group).filter(Group.manager_id == user_id).first() 
     

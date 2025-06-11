@@ -13,15 +13,22 @@ router = APIRouter()
 
 class UseCase:
     repository: Repository
-    group_repo: IGroupRepository
+    group_enrollment_repo: IGroupRepository
 
     def __init__(self):
-        self.repository = Repository(group_repo=True)
-        self.group_repo = self.repository.group_repo
+        self.repository = Repository(group_enrollment_repo=True)
+        self.group_enrollment_repo = self.repository.group_enrollment_repo
 
     def execute(self, schema: AddUserGroupRequest) -> AddUserGroupResponse:
-        new_enrollment = self.group_repo.add_user_group(user_id=schema.user_id, group_id=schema.group_id)
-        return new_enrollment
+        # supondo que add_user_group aceita lista de user_id e cria vários
+        new_enrollments = self.group_enrollment_repo.add_user_group(users_id=schema.users_id, group_id=schema.group_id)
+        added_user_ids = [enrollment.student_id for enrollment in new_enrollments]
+        
+        # Retornar no formato esperado do seu schema AddUserGroupResponse
+        return AddUserGroupResponse(
+            group_id=schema.group_id,
+            user_id=added_user_ids
+        )
 
 
 class Controller:
@@ -40,7 +47,7 @@ class Controller:
 @router.post("/add_user_group", response_model=AddUserGroupResponse)
 async def add_user_group(
     request: AddUserGroupRequest = Body(...),
-    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.ADMIN | PermissionLevelEnum.PROFESSOR))
+    token_user: TokenUser = Security(RequirePermission(PermissionLevelEnum.PROFESSOR))
 ):
     use_case = UseCase()
     controller = Controller(use_case=use_case)

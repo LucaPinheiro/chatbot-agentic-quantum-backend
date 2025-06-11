@@ -82,3 +82,27 @@ class ClassTopicsRepositoryPostgres:
         self.db.add_all(orm_objects)
         self.db.commit()
 
+    def add_topics_to_class(self, topics: List[ClassTopicsEntity]) -> None:
+        orm_objects = [topic.to_orm() for topic in topics]
+        self.db.add_all(orm_objects)
+        self.db.commit()
+
+    def get_topics_by_class_id(self, class_id: str) -> List[ClassTopicsEntity]:
+        results = (
+            self.db.query(ClassTopic)
+            .filter(ClassTopic.class_id == class_id)
+            .all()
+        )
+
+        # Converte ORM para entidades de domínio
+        return [
+            ClassTopicsEntity(
+                class_topics_id=row.class_topics_id,
+                topic=row.topic,
+                class_id=row.class_id,
+                user_id=row.user_id,
+                pdf_url=row.pdf_url,
+            )
+            for row in results
+        ]
+        

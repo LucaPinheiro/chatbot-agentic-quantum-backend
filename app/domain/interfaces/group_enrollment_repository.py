@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import List
+
+from app.models.models import GroupEnrollment
 
 
 class IGroupEnrollmentRepository(ABC):
@@ -16,4 +19,12 @@ class IGroupEnrollmentRepository(ABC):
     Retorna todos os alunos matriculados no grupo
     """
     pass
-  
+  def get_enrollment_by_student_id(self, student_id: str) -> GroupEnrollment | None:
+        pass
+  def delete_user_from_group(self, user_id: str) -> object:
+        """
+        Remove um usuário do grupo
+        """
+        pass
+  def add_user_group(self, user_id: List[str], group_id: str) -> GroupEnrollment:
+        pass
