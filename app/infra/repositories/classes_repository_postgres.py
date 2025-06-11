@@ -19,13 +19,21 @@ class ClassesRepositoryPostgres(IClassesRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    def get_classes_by_group(self, group_id: str) -> List[ClassEntity]:
+    def get_classes_by_group(self, group_id: str) -> List[ClassORM]:
+        # Debug: verifica se o group_id está sendo passado corretamente
         print(f"[DEBUG] Buscando classes para group_id: {group_id!r}")
-        classes = self.db.query(ClassEntity).filter(ClassEntity.group_id == group_id).all()
+
+        # Certifique-se de que está utilizando a entidade do SQLAlchemy, não o modelo Pydantic.
+        classes = self.db.query(ClassORM).filter(ClassORM.group_id == group_id).all()
+
+        # Caso não haja classes, retorna uma lista vazia
         if not classes:
             return []
+
+        # Debug: Mostra as classes encontradas
         print(f"[DEBUG] Resultado da query: {classes}")
-        print(type(group_id))
+        
+        # Retorna a lista de classes encontradas
         return classes
 
     def delete_class(self, class_id: str, title: str):
