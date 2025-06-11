@@ -28,3 +28,6 @@ class IClassesRepository:
     @abstractmethod
     def create_class(_class: ClassModel) -> None:
         pass
+    @abstractmethod
+    def get_all_classes_by_user(self, user_id: str) -> List[ClassModel]:
+        pass
