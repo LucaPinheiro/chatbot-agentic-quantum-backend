@@ -16,6 +16,11 @@ class TopicProgressRepositoryPostgres:
         self.db.add_all(orm_objects)  
         self.db.commit()    
 
+    def add_topic_progress(self, entries: List[TopicProgress]) -> None:
+      self.db.add_all(entries)
+      self.db.commit()             
+
+
     def get_progress_by_group_and_user(self, group_id: str, user_id: str):
         print('Executando a consulta de progresso...') # Debug
         return self.db.query(

@@ -19,3 +19,9 @@ class IClassTopicsRepository(ABC):
         Cria um tópico de aula
         """
         pass
+    @abstractmethod
+    def add_topics_to_class(self, class_id: str, topics: List[ClassTopics]) -> None:
+        """
+        Adiciona tópicos a uma aula
+        """
+        pass

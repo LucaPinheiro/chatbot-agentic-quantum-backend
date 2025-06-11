@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 
 class GetAllGroupsRequest(BaseModel):
@@ -10,3 +11,4 @@ class GetAllGroupsResponse(BaseModel):
     year_semester: int
     status: bool
     manager_id: str
+    users_id: List[str]

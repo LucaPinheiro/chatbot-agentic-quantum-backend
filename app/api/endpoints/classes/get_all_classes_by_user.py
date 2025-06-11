@@ -30,9 +30,8 @@ class UseCase:
                 class_id=cls.class_id,
                 group_id=cls.group_id,
                 title=cls.title,
-                pdf_url=cls.pdf_url,
+                manager_id=cls.manager_id,
                 status=cls.status,
-                last_access_class=cls.last_access_class,
                 created_at=cls.created_at,
                 order=cls.order
             )

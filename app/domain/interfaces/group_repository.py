@@ -45,3 +45,6 @@ class IGroupRepository:
         Retorna todos os grupos
         """
         pass
+    @abstractmethod
+    def get_group_by_manager_id(self, manager_id: str) -> Group | None:
+        pass

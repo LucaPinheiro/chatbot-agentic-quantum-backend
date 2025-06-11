@@ -1,11 +1,11 @@
+from typing import List
 from pydantic import BaseModel
 
 
 class AddUserGroupRequest(BaseModel):
-    user_id: str
+    users_id: List[str]
     group_id: str
     
 class AddUserGroupResponse(BaseModel):
-    user_id: str
+    users_id: List[str]
     group_id: str
-    message: str

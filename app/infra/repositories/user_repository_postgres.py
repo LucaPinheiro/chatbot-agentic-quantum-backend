@@ -5,7 +5,7 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository import IUserRepository
-from app.models.models import TopicProgress, User as UserModel
+from app.models.models import GroupEnrollment, TopicProgress, User as UserModel
 from app.helpers.exceptions.exceptions import NotFoundException
 
 
@@ -80,3 +80,8 @@ class UserRepositoryPostgres(IUserRepository):
         self.db.refresh(user)
 
         return User.from_orm(user)
+    
+    def get_user_ids_by_group_id(self, group_id: str) -> List[str]:
+        result = self.db.query(GroupEnrollment.student_id).filter(GroupEnrollment.group_id == group_id).all()
+        user_ids = [row[0] for row in result]
+        return user_ids
