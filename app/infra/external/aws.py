@@ -87,6 +87,7 @@ class DynamoDBResources:
             return self._undecimalise(item) if item else None
         except ClientError as exc:
             raise DynamoRepositoryError(exc) from exc
+        
 
     def update(self, partition_key: str, sort_key: str, update_dict: Dict[str, Any]) -> Dict[str, Any]:
         try:

@@ -48,5 +48,4 @@ class FileRepositoryS3(IFileRepository):
         if not obj:
             return None
         return File.from_s3_dict(obj)
-
     
